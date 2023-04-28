@@ -25,7 +25,7 @@ class TrackingItem(Item):
     """tracking-item class."""
 
     item_type = 'tracking_item'
-    schema = load_schema('encoded-core:schemas/tracking_item.json')
+    schema = load_schema('encoded_core:schemas/tracking_item.json')
     embedded_list = []
     STATUS_ACL = Item.STATUS_ACL.copy()
     STATUS_ACL.update({

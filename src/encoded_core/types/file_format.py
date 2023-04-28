@@ -21,7 +21,7 @@ from snovault.types.base import (
 class FileFormat(Item, ItemWithAttachment):
     """The class to store information about 4DN file formats"""
     item_type = 'file_format'
-    schema = load_schema('encoded-core:schemas/file_format.json')
+    schema = load_schema('encoded_core:schemas/file_format.json')
     name_key = 'file_format'
 
     @calculated_property(schema={

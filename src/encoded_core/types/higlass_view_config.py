@@ -16,6 +16,6 @@ class HiglassViewConfig(Item):
     """
 
     item_type = 'higlass_view_config'
-    schema = load_schema('encoded-core:schemas/higlass_view_config.json')
+    schema = load_schema('encoded_core:schemas/higlass_view_config.json')
     embedded_list = []
     name_key = 'name'

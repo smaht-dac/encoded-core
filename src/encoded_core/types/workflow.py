@@ -36,7 +36,7 @@ class Workflow(Item):
     """The Workflow class that describes a workflow and steps in it."""
 
     item_type = 'workflow'
-    schema = load_schema('encoded-core:schemas/workflow.json')
+    schema = load_schema('encoded_core:schemas/workflow.json')
     embedded_list = _build_workflows_embedded_list()
     rev = {
         'newer_versions': ('Workflow', 'previous_version')

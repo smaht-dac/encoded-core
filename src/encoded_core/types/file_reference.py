@@ -15,6 +15,6 @@ from .file import File
 class FileReference(File):
     """Collection for individual reference files."""
     item_type = 'file_reference'
-    schema = load_schema('encoded-core:schemas/file_reference.json')
+    schema = load_schema('encoded_core:schemas/file_reference.json')
     embedded_list = File.embedded_list
     name_key = 'accession'

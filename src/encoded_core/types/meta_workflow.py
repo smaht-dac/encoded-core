@@ -64,7 +64,7 @@ def _build_meta_workflow_run_embedded_list():
 class MetaWorkflow(Item):
     item_type = 'meta_workflow'
     name_key = 'accession'
-    schema = load_schema('encoded-core:schemas/meta_workflow.json')
+    schema = load_schema('encoded_core:schemas/meta_workflow.json')
 
 
 @collection(
@@ -76,4 +76,4 @@ class MetaWorkflow(Item):
 class MetaWorkflowRun(Item):
     item_type = 'meta_workflow_run'
     embedded_list = _build_meta_workflow_run_embedded_list()
-    schema = load_schema('encoded-core:schemas/meta_workflow_run.json')
+    schema = load_schema('encoded_core:schemas/meta_workflow_run.json')

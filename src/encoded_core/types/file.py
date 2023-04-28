@@ -205,7 +205,7 @@ class File(Item):
     """Collection for individual files."""
     item_type = 'file'
     base_types = ['File'] + Item.base_types
-    schema = load_schema('encoded-core:schemas/file.json')
+    schema = load_schema('encoded_core:schemas/file.json')
     embedded_list = _build_file_embedded_list()
     name_key = 'accession'
 

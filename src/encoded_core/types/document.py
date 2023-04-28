@@ -19,7 +19,7 @@ class Document(ItemWithAttachment, Item):
     """Document class."""
 
     item_type = 'document'
-    schema = load_schema('encoded-core:schemas/document.json')
+    schema = load_schema('encoded_core:schemas/document.json')
     embedded_list = []
     mimetype_map = {'application/proband+xml': ['text/plain']}
 

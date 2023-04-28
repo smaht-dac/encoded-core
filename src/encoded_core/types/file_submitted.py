@@ -26,7 +26,7 @@ def _build_file_submitted_embedded_list():
 class FileSubmitted(File):
     """Collection for individual submitted files."""
     item_type = 'file_submitted'
-    schema = load_schema('encoded-core:schemas/file_submitted.json')
+    schema = load_schema('encoded_core:schemas/file_submitted.json')
     embedded_list = _build_file_submitted_embedded_list()
     name_key = 'accession'
     rev = dict(File.rev, **{

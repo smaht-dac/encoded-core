@@ -21,7 +21,7 @@ class Image(ItemWithAttachment, Item):
     """Class image,defines accepted file types."""
 
     item_type = 'image'
-    schema = load_schema('encoded-core:schemas/image.json')
+    schema = load_schema('encoded_core:schemas/image.json')
     schema['properties']['attachment']['properties']['type']['enum'] = [
         'image/png',
         'image/jpeg',

@@ -6,6 +6,9 @@ configure:
 build:
 	poetry install
 
+test:
+	bin/test.sh
+
 info:
 	@: $(info Here are some 'make' options:)
 	   $(info - Use 'make configure' to download a working poetry version.)
