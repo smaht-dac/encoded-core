@@ -6,8 +6,11 @@ configure:
 build:
 	poetry install
 
+test-any:
+	poetry run python -m pytest -xvv -r w --timeout=200
+
 test:
-	bin/test.sh
+	make test-any
 
 info:
 	@: $(info Here are some 'make' options:)

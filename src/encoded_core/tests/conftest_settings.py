@@ -2,7 +2,7 @@ _app_settings = {
     "collection_datastore": "database",
     "item_datastore": "database",
     "multiauth.policies": "session remoteuser accesskey auth0",
-    "multiauth.groupfinder": "encoded.authorization.groupfinder",
+    "multiauth.groupfinder": "snovault.authorization.groupfinder",
     "multiauth.policy.session.use": "snovault.authentication.NamespacedAuthenticationPolicy",
     "multiauth.policy.session.base": "pyramid.authentication.SessionAuthenticationPolicy",
     "multiauth.policy.session.namespace": "mailto",

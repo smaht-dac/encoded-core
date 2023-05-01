@@ -141,7 +141,7 @@ steps_run_data_schema = {
 }
 
 
-workflow_schema = load_schema('encoded:schemas/workflow.json')
+workflow_schema = load_schema('encoded_core:schemas/workflow.json')
 workflow_steps_property_schema = workflow_schema.get('properties', {}).get('steps')
 workflow_run_steps_property_schema = copy.deepcopy(workflow_steps_property_schema)
 workflow_run_steps_property_schema['items']['properties']['inputs']['items']['properties']['run_data'] = steps_run_data_schema
@@ -158,7 +158,7 @@ class WorkflowRun(Item):
     """The WorkflowRun class that describes execution of a workflow."""
 
     item_type = 'workflow_run'
-    schema = load_schema('encoded:schemas/workflow_run.json')
+    schema = load_schema('encoded_core:schemas/workflow_run.json')
     embedded_list = _build_workflow_run_embedded_list()
 
     @calculated_property(schema=workflow_run_steps_property_schema, category='page')
@@ -300,5 +300,5 @@ class WorkflowRunAwsem(WorkflowRun):
     """The WorkflowRun class that describes execution of a workflow on AWSEM platform."""
     base_types = ['WorkflowRun'] + Item.base_types
     item_type = 'workflow_run_awsem'
-    schema = load_schema('encoded:schemas/workflow_run_awsem.json')
+    schema = load_schema('encoded_core:schemas/workflow_run_awsem.json')
     embedded_list = WorkflowRun.embedded_list

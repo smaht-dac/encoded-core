@@ -60,7 +60,8 @@ def main(global_config, **local_config):
         config.include('.search.compound_search')  # could make enabling configurable
 
     if asbool(settings.get('testing', False)):
-        config.include('.tests.testing_views')
+        config.include('snovault.tests.testing_views')
+        config.include('snovault.root')
 
     config.include('.upgrade')
 

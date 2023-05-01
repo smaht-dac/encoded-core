@@ -1,6 +1,7 @@
 import pytest
 
 from unittest import mock
+from .datafixtures import file_formats
 from ..types import file as tf
 from ..types.file import external_creds
 
@@ -170,79 +171,65 @@ def test_validate_extra_files_bad_extras_format(
     assert "'whosit' not a valid or known file format" in descriptions
 
 
-def test_validate_file_format_validity_for_file_type_allows(testapp, file_formats, project, institution):
+def test_validate_file_format_validity_for_file_type_allows(testapp, file_formats):
     my_fastq_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': file_formats.get('fastq').get('uuid'),
     }
     my_proc_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': file_formats.get('bam').get('uuid'),
     }
-    res1 = testapp.post_json('/files-fastq', my_fastq_file, status=201)
+    res1 = testapp.post_json('/files-submitted', my_fastq_file, status=201)
     res2 = testapp.post_json('/files-processed', my_proc_file, status=201)
     assert not res1.json.get('errors')
     assert not res2.json.get('errors')
 
 
-def test_validate_file_format_validity_for_file_type_fires(testapp, file_formats, project, institution):
+def test_validate_file_format_validity_for_file_type_fires(testapp, file_formats):
     my_fastq_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': file_formats.get('bam').get('uuid'),
     }
     my_proc_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': file_formats.get('fastq').get('uuid'),
     }
-    res1 = testapp.post_json('/files-fastq', my_fastq_file, status=422)
+    res1 = testapp.post_json('/files-submitted', my_fastq_file, status=422)
     errors = res1.json['errors']
     descriptions = ''.join([e['description'] for e in errors])
-    assert "File format bam is not allowed for FileFastq" in descriptions
+    assert "File format bam is not allowed for FileSubmitted" in descriptions
     res2 = testapp.post_json('/files-processed', my_proc_file, status=422)
     errors = res2.json['errors']
     descriptions = ''.join([e['description'] for e in errors])
     assert "File format fastq is not allowed for FileProcessed" in descriptions
 
 
-def test_file_format_does_not_exist(testapp, file_formats, project, institution):
+def test_file_format_does_not_exist(testapp, file_formats):
     my_fastq_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': 'waldo',
     }
-    res1 = testapp.post_json('/files-fastq', my_fastq_file, status=422)
+    res1 = testapp.post_json('/files-submitted', my_fastq_file, status=422)
     errors = res1.json['errors']
     descriptions = ''.join([e['description'] for e in errors])
     assert "'waldo' not found" in descriptions
 
 
-def test_filename_patch_fails_wrong_format(testapp, file_formats, project, institution):
+def test_filename_patch_fails_wrong_format(testapp, file_formats):
     my_fastq_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': file_formats.get('fastq').get('uuid'),
         'filename': 'test.fastq.gz'
     }
-    res1 = testapp.post_json('/files-fastq', my_fastq_file, status=201)
+    res1 = testapp.post_json('/files-submitted', my_fastq_file, status=201)
     resobj = res1.json['@graph'][0]
     patch_data = {"file_format": file_formats.get('bam').get('uuid')}
-    res2 = testapp.patch_json('/files-fastq/' + resobj['uuid'], patch_data, status=422)
+    res2 = testapp.patch_json('/files-submitted/' + resobj['uuid'], patch_data, status=422)
     errors = res2.json['errors']
     error1 = "Filename test.fastq.gz extension does not agree with specified file format. Valid extension(s): '.bam'"
-    error2 = "File format bam is not allowed for FileFastq"
+    error2 = "File format bam is not allowed for FileSubmitted"
     descriptions = ''.join([e['description'] for e in errors])
     assert error1 in descriptions
     assert error2 in descriptions
 
 
-def test_filename_patch_works_with_different_format(testapp, file_formats, project, institution):
+def test_filename_patch_works_with_different_format(testapp, file_formats):
     my_proc_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': file_formats.get('bam').get('uuid'),
         'filename': 'test.bam'
     }
@@ -253,10 +240,8 @@ def test_filename_patch_works_with_different_format(testapp, file_formats, proje
     assert not res2.json.get('errors')
 
 
-def test_file_format_patch_works_if_no_filename(testapp, file_formats, project, institution):
+def test_file_format_patch_works_if_no_filename(testapp, file_formats):
     my_proc_file = {
-        'project': project['@id'],
-        'institution': institution['@id'],
         'file_format': file_formats.get('bam').get('uuid')
     }
     res1 = testapp.post_json('/files-processed', my_proc_file, status=201)
@@ -264,14 +249,3 @@ def test_file_format_patch_works_if_no_filename(testapp, file_formats, project, 
     patch_data = {"file_format": file_formats.get('zip').get('uuid')}
     res2 = testapp.patch_json('/files-processed/' + resobj['uuid'], patch_data, status=200)
     assert not res2.json.get('errors')
-
-
-@pytest.fixture
-def custom_experiment_set_data(institution, project):
-    return {
-        'institution': institution['@id'],
-        'project': project['@id'],
-        'description': 'test experiment set',
-        'experimentset_type': 'custom',
-        'status': 'in review'
-    }

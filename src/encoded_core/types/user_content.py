@@ -24,7 +24,7 @@ import requests
 class UserContent(Item):
     item_type = 'user_content'
     base_types = ['UserContent'] + Item.base_types
-    schema = load_schema('encoded:schemas/user_content.json')
+    schema = load_schema('encoded_core:schemas/user_content.json')
     embedded_list = []
 
     @calculated_property(schema={
@@ -86,7 +86,7 @@ class UserContent(Item):
 class StaticSection(UserContent):
     """The Software class that contains the software... used."""
     item_type = 'static_section'
-    schema = load_schema('encoded:schemas/static_section.json')
+    schema = load_schema('encoded_core:schemas/static_section.json')
 
     @calculated_property(schema={
         "title": "Content",

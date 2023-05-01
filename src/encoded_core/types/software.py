@@ -21,7 +21,7 @@ from snovault.types.base import (
 class Software(Item):
     """The Software class that contains the software... used."""
     item_type = 'software'
-    schema = load_schema('encoded:schemas/software.json')
+    schema = load_schema('encoded_core:schemas/software.json')
     embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
 
     def _update(self, properties, sheets=None):

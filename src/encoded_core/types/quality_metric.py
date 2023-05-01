@@ -94,7 +94,7 @@ class QualityMetric(Item):
     """Quality metrics class."""
     item_type = 'quality_metric'
     base_types = ['QualityMetric'] + Item.base_types
-    schema = load_schema('encoded:schemas/quality_metric.json')
+    schema = load_schema('encoded_core:schemas/quality_metric.json')
     embedded_list = Item.embedded_list
 
 
