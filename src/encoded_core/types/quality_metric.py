@@ -98,6 +98,19 @@ class QualityMetric(Item):
     embedded_list = Item.embedded_list
 
 
+@collection(
+    name="quality-metrics-generic",
+    properties={
+        "title": "Generic Quality Metrics",
+        "description": "Listing of Generic Quality Metrics",
+    },
+)
+class QualityMetricGeneric(QualityMetric):
+    item_type = "quality_metric_generic"
+    schema = load_schema("encoded_core:schemas/quality_metric_generic.json")
+    embedded_list = QualityMetric.embedded_list
+
+
 def parse_qc_s3_url(url):
     """ Parses the given s3 URL into its pair of bucket, key
         Note that this function works the way it does because of how these

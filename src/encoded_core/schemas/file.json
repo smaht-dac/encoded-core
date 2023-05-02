@@ -299,6 +299,17 @@
             ],
             "linkTo": "QualityMetric"
         },
+        "quality_metrics": {
+            "type": "array",
+            "title": "Quality Metrics",
+            "description": "Associated QC reports",
+            "items": {
+                "type": "string",
+                "title": "Quality Metric",
+                "description": "Associated QC report",
+                "linkTo": "QualityMetric"
+            }
+        },
         "quality_metric_summary": {
             "type": "array",
             "title": "Quality Metric Summary",

@@ -230,7 +230,7 @@
             "type": "string",
             "title": "Quality Metric",
             "description": "The associated QC reports",
-            "linkTo": "QualityMetricWorkflowrun"
+            "linkTo": "QualityMetric"
         },
         "commands": {
             "title": "Run Commands",

@@ -1,12 +1,8 @@
 import pytest
 
 from unittest import mock
-from .datafixtures import file_formats
 from ..types import file as tf
 from ..types.file import external_creds
-
-
-pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 @pytest.fixture

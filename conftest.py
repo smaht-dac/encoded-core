@@ -1,6 +1,11 @@
 import tempfile
 
 
+pytest_plugins = [
+    'src.encoded_core.tests.datafixtures'
+]
+
+
 def pytest_configure():
     # This adjustment is important to set the default choice of temporary filenames to a nice short name
     # because without it some of the filenames we generate end up being too long, and critical functionality

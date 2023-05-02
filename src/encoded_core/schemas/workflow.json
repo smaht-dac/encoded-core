@@ -657,10 +657,6 @@
             "colTitle": "Category",
             "default_hidden": true
         },
-        "experiment_types": {
-            "title": "Experiment Types",
-            "comment": "TODO: Update to `experiment_types.display_title` once becomes a linkTo"
-        },
         "app_name": {
             "title": "App Name"
         },
