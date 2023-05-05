@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 configure:
-	pip install poetry==1.3.2
+	pip install poetry==1.4.2
 
 build:
 	poetry install
@@ -10,6 +10,9 @@ test-any:
 	poetry run python -m pytest -xvv -r w --timeout=200
 
 test:
+	make test-any
+
+remote-test:
 	make test-any
 
 info:

@@ -3,9 +3,7 @@
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
 
-# import datetime as datetime_module
 import logging
-import os
 import pkg_resources
 import pytest
 import webtest
@@ -20,9 +18,6 @@ from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from snovault.util import generate_indexer_namespace_for_testing
 from snovault.loadxl import load_all
-from snovault.tests.serverfixtures import (
-    wsgi_server_host_port, conn, DBSession, _DBSession, engine, engine_url, zsa_savepoints, check_constraints
-)
 from .conftest_settings import make_app_settings_dictionary
 from .. import main
 
