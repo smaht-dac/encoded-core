@@ -44,22 +44,22 @@ jobs:
         run: |
           make build
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-east-1
 
       - name: QA
         env:
-          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          # S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
           # # The need for this old environment variable name will go away soon.
           # TRAVIS_JOB_ID: sno-x-test-${{ github.run_number }}-
           # This will be the new environment variable name.
           TEST_JOB_ID: sno-test-indexing-${{ github.run_number }}-${{ matrix.python_version }}-
         run: |
-          make remote-test
+          make test
 
       - name: Cleanup
         if: ${{ always() }}
