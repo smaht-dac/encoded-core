@@ -19,7 +19,7 @@ from snovault.types.base import (
     name='tracking-items',
     properties={
         'title': 'TrackingItem',
-        'description': 'For internal tracking of Fourfront events',
+        'description': 'For internal tracking of ENCODED events',
     })
 class TrackingItem(Item):
     """tracking-item class."""
@@ -27,12 +27,11 @@ class TrackingItem(Item):
     item_type = 'tracking_item'
     schema = load_schema('encoded_core:schemas/tracking_item.json')
     embedded_list = []
-    STATUS_ACL = Item.STATUS_ACL.copy()
-    STATUS_ACL.update({
+    STATUS_ACL = {
         'released': ONLY_ADMIN_VIEW_ACL,
         'deleted': DELETED_ACL,
         'draft': ONLY_ADMIN_VIEW_ACL
-    })
+    }
 
     @classmethod
     def create_and_commit(cls, request, properties, clean_headers=False):

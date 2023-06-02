@@ -9,7 +9,6 @@ from snovault.attachment import ItemWithAttachment
 @collection(
     name='file-formats',
     unique_key='file_format:file_format',
-    lookup_key='file_format',
     properties={
         'title': 'File Formats',
         'description': 'Listing of file formats used by 4DN'

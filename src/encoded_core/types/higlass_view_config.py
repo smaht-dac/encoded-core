@@ -4,8 +4,7 @@ from snovault.types.base import Item
 
 @collection(
     name='higlass-view-configs',
-    unique_key='higlass_view_config:uuid',
-    lookup_key='name',
+    unique_key='higlass_view_config:name',
     properties={
         'title': 'HiGlass Displays',
         'description': 'Displays and view configurations for HiGlass',
