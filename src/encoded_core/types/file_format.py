@@ -4,9 +4,6 @@ from snovault import (
     load_schema,
 )
 from snovault.attachment import ItemWithAttachment
-from snovault.types.base import (
-    Item
-)
 
 
 @collection(
@@ -18,7 +15,7 @@ from snovault.types.base import (
         'description': 'Listing of file formats used by 4DN'
     }
 )
-class FileFormat(Item, ItemWithAttachment):
+class FileFormat(ItemWithAttachment):
     """The class to store information about 4DN file formats"""
     item_type = 'file_format'
     schema = load_schema('encoded_core:schemas/file_format.json')

@@ -1,6 +1,6 @@
 {
     "title": "Submitted file",
-    "description": "File submitted to CGAP",
+    "description": "File submitted to ENCODED",
     "id": "/profiles/file_submitted.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",

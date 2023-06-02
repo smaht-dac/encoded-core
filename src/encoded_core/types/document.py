@@ -15,7 +15,7 @@ from snovault.types.base import (
         'title': 'Documents',
         'description': 'Listing of Documents',
     })
-class Document(ItemWithAttachment, Item):
+class Document(ItemWithAttachment):
     """Document class."""
 
     item_type = 'document'

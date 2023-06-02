@@ -17,7 +17,7 @@ from snovault.attachment import ItemWithAttachment
         'title': 'Image',
         'description': 'Listing of portal images',
     })
-class Image(ItemWithAttachment, Item):
+class Image(ItemWithAttachment):
     """Class image,defines accepted file types."""
 
     item_type = 'image'
