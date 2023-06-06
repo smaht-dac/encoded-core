@@ -17,4 +17,3 @@ class FileReference(File):
     item_type = 'file_reference'
     schema = load_schema('encoded_core:schemas/file_reference.json')
     embedded_list = File.embedded_list
-    name_key = 'accession'

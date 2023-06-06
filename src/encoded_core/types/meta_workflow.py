@@ -56,14 +56,12 @@ def _build_meta_workflow_run_embedded_list():
 
 @collection(
     name='meta-workflows',
-    unique_key='accession',
     properties={
         'title': 'MetaWorkflows',
         'description': 'Listing of MetaWorkflows',
     })
 class MetaWorkflow(Item):
     item_type = 'meta_workflow'
-    name_key = 'accession'
     schema = load_schema('encoded_core:schemas/meta_workflow.json')
 
 

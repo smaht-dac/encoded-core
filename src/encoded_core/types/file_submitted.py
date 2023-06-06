@@ -28,7 +28,6 @@ class FileSubmitted(File):
     item_type = 'file_submitted'
     schema = load_schema('encoded_core:schemas/file_submitted.json')
     embedded_list = _build_file_submitted_embedded_list()
-    name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
         'workflow_run_outputs': ('WorkflowRun', 'output_files.value'),

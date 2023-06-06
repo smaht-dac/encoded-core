@@ -18,7 +18,6 @@ class FileProcessed(File):
     item_type = 'file_processed'
     schema = load_schema('encoded_core:schemas/file_processed.json')
     embedded_list = File.embedded_list + file_workflow_run_embeds
-    name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
         'workflow_run_outputs': ('WorkflowRun', 'output_files.value'),
