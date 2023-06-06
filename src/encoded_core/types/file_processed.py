@@ -8,7 +8,6 @@ from .file import File, file_workflow_run_embeds
 
 @collection(
     name='files-processed',
-    unique_key='accession',
     properties={
         'title': 'Processed Files',
         'description': 'Listing of Processed Files',

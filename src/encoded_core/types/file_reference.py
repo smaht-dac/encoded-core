@@ -7,7 +7,6 @@ from .file import File
 
 @collection(
     name='files-reference',
-    unique_key='accession',
     properties={
         'title': 'Reference Files',
         'description': 'Listing of Reference Files',

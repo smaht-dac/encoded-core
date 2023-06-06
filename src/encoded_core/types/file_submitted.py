@@ -18,7 +18,6 @@ def _build_file_submitted_embedded_list():
 
 @collection(
     name="files-submitted",
-    unique_key="accession",
     properties={
         "title": "Submitted Files",
         "description": "Listing of Submitted Files",

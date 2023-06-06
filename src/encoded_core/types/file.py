@@ -175,7 +175,6 @@ class File(Item):
     base_types = ['File'] + Item.base_types
     schema = load_schema('encoded_core:schemas/file.json')
     embedded_list = _build_file_embedded_list()
-    name_key = 'accession'
 
     @calculated_property(schema={
         "title": "Display Title",
