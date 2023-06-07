@@ -4,6 +4,7 @@ configure:
 	pip install poetry==1.4.2
 
 build:
+	make configure
 	poetry install
 
 test-any:
