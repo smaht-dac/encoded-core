@@ -1,0 +1,486 @@
+{
+    "title": "Data File",
+    "description": "Schema for submitting metadata for a data file.",
+    "id": "/profiles/file.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "file_format"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
+    "additionalProperties": false,
+    "mixinFacets": [],
+    "properties": {
+        "accession": {
+            "accessionType": "FI"
+        },
+        "description": {
+            "title": "Description",
+            "description": "A plain text description of the file.",
+            "type": "string",
+            "lookup": 10,
+            "formInput": "textarea"
+        },
+        "filename": {
+            "title": "File Name",
+            "description": "The local file name used at time of submission. Must be alphanumeric, with the exception of the following special characters: '+=,.@-_'",
+            "s3Upload": true,
+            "ff_flag": "second round",
+            "type": "string",
+            "pattern": "^[\\w+=,.@-]*$",
+            "comment": "ultimately uploaded filename will be uuid/accession, but filename with no directory will be store in metadata as passed in"
+        },
+        "file_format": {
+            "title": "File Format",
+            "type": "string",
+            "linkTo": "FileFormat",
+            "lookup": 20,
+            "ff_flag": "filter:valid_item_types"
+        },
+        "file_type": {
+            "title": "File Type",
+            "description": "The type of file based on the information in the file.",
+            "type": "string",
+            "lookup": 22
+        },
+        "file_version": {
+            "title": "File Version",
+            "description": "The version of file based on how it was originally generated.",
+            "type": "string"
+        },
+        "file_version_date": {
+            "title": "File Version",
+            "description": "The date of the version of file based on when it was originally generated. Accepted formats: YYYYMMDD, YYYY-MM-DD, YYYY-MM-DD-HH:MM:SS",
+            "type": "string",
+            "anyOf": [
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
+            ]
+        },
+        "file_classification": {
+            "title": "General Classification",
+            "description": "General classification group for the File (raw, processed, ancillary (eg. index files))",
+            "internal_comment": "This will control how, when and where a file can be displayed - on pages (eg. ancillary files like index files will show up in workflow_run but not experiment)",
+            "type": "string",
+            "lookup": 23,
+            "enum": [
+                "raw file",
+                "processed file",
+                "ancillary file",
+                "other file",
+                "visualization"
+            ]
+        },
+        "md5sum": {
+            "title": "MD5sum",
+            "description": "The md5sum of the file being transferred.",
+            "comment": "This can vary for files of same content gzipped at different times",
+            "type": "string",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "ff_flag": "clear edit",
+            "format": "hex"
+        },
+        "content_md5sum": {
+            "title": "Content MD5sum",
+            "description": "The MD5sum of the uncompressed file.",
+            "comment": "This is only relavant for gzipped files.",
+            "type": "string",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "format": "hex",
+            "uniqueKey": "file:content_md5sum"
+        },
+        "file_size": {
+            "title": "File Size",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "description": "Size of file on disk.",
+            "comment": "File size is specified in bytes - presumably this can be a calculated property as well",
+            "type": "integer"
+        },
+        "extra_files": {
+            "title": "Extra Files",
+            "description": "Links to extra files on s3 that don't have associated metadata",
+            "type": "array",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "items": {
+                "title": "Extra File",
+                "type": "object",
+                "required": [
+                    "file_format"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "filename": {
+                        "title": "File Name",
+                        "type": "string"
+                    },
+                    "file_format": {
+                        "title": "File Format",
+                        "type": "string",
+                        "linkTo": "FileFormat",
+                        "lookup": 400
+                    },
+                    "href": {
+                        "title": "Download URL",
+                        "type": "string",
+                        "exclude_from": [
+                            "FFedit-create"
+                        ]
+                    },
+                    "md5sum": {
+                        "title": "MD5sum",
+                        "description": "The md5sum of the extra file.",
+                        "type": "string",
+                        "exclude_from": [
+                            "FFedit-create"
+                        ],
+                        "ff_flag": "clear edit",
+                        "format": "hex"
+                    },
+                    "file_size": {
+                        "title": "File Size",
+                        "exclude_from": [
+                            "FFedit-create"
+                        ],
+                        "description": "Size of file of the extra file.",
+                        "comment": "File size is specified in bytes",
+                        "type": "integer"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "type": "string",
+                        "default": "uploading",
+                        "enum": [
+                            "uploading",
+                            "uploaded",
+                            "upload failed",
+                            "to be uploaded by workflow",
+                            "current",
+                            "shared",
+                            "replaced",
+                            "in review",
+                            "obsolete",
+                            "inactive",
+                            "archived",
+                            "deleted"
+                        ]
+                    }
+                }
+            }
+        },
+        "related_files": {
+            "title": "Related Files",
+            "description": "Files related to this one",
+            "ff_flag": "second round",
+            "type": "array",
+            "items": {
+                "title": "Related File",
+                "type": "object",
+                "required": [
+                    "relationship_type",
+                    "file"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "relationship_type": {
+                        "type": "string",
+                        "lookup": 31,
+                        "description": "A controlled term specifying the relationship between files.",
+                        "title": "Relationship Type",
+                        "enum": [
+                            "supercedes",
+                            "is superceded by",
+                            "derived from",
+                            "parent of",
+                            "paired with"
+                        ]
+                    },
+                    "file": {
+                        "type": "string",
+                        "lookup": 32,
+                        "description": "The related file",
+                        "linkTo": "File"
+                    }
+                }
+            }
+        },
+        "restricted": {
+            "title": "Is Restricted File",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "description": "A flag to indicate whether this file is subject to restricted access",
+            "type": "boolean"
+        },
+        "s3_lifecycle_category": {
+            "title": "S3 Lifecycle Category",
+            "description": "The lifecycle category determines how long a file remains in a certain storage class.  If set to ignore, lifecycle management will have no effect on this file",
+            "type": "string",
+            "suggested_enum": [
+                "short_term_access_long_term_archive",
+                "long_term_access_long_term_archive",
+                "long_term_access",
+                "short_term_access",
+                "long_term_archive",
+                "short_term_archive",
+                "no_storage",
+                "ignore"
+            ]
+        },
+        "s3_lifecycle_status": {
+            "title": "S3 Lifecycle Status",
+            "description": "Current S3 storage class of this object.",
+            "internal_comment": "Files in Standard and Infrequent Access are accessible without restriction. Files in Glacier and Deep Archive need to be requested and cannot be downloaded",
+            "type": "string",
+            "default": "standard",
+            "enum": [
+                "standard",
+                "infrequent access",
+                "glacier",
+                "deep archive",
+                "deleted"
+            ]
+        },
+        "s3_lifecycle_last_checked": {
+            "title": "S3 Lifecycle - last checked",
+            "description": "Date when the lifecycle status of the file was last checked",
+            "type": "string",
+            "anyOf": [
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
+            ]
+        },
+        "status": {
+            "title": "Status",
+            "type": "string",
+            "default": "uploading",
+            "permission": "restricted_fields",
+            "enum": [
+                "uploading",
+                "uploaded",
+                "upload failed",
+                "to be uploaded by workflow",
+                "current",
+                "shared",
+                "replaced",
+                "in review",
+                "obsolete",
+                "inactive",
+                "archived",
+                "deleted"
+            ]
+        },
+        "quality_metric": {
+            "notes": "This could be a single Quality Metric or a 'container' Quality Metric item that contains a list of QualityMetrics in its 'qc_list' property.",
+            "type": "string",
+            "title": "Quality Metric",
+            "description": "The associated QC reports",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "linkTo": "QualityMetric"
+        },
+        "quality_metrics": {
+            "type": "array",
+            "title": "Quality Metrics",
+            "description": "Associated QC reports",
+            "items": {
+                "type": "string",
+                "title": "Quality Metric",
+                "description": "Associated QC report",
+                "linkTo": "QualityMetric"
+            }
+        },
+        "quality_metric_summary": {
+            "type": "array",
+            "title": "Quality Metric Summary",
+            "description": "Selected Quality Metrics for Summary",
+            "items": {
+                "title": "Selected Quality Metric",
+                "type": "object",
+                "required": [
+                    "title",
+                    "value",
+                    "numberType"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the Quality Metric",
+                        "title": "Title of the Quality Metric"
+                    },
+                    "value": {
+                        "type": "string",
+                        "title": "Value of the Quality Metric",
+                        "description": "value of the quality metric as a string"
+                    },
+                    "tooltip": {
+                        "type": "string",
+                        "title": "Tooltip for the Quality Metric",
+                        "description": "tooltip for the quality metric to be displayed upon mouseover"
+                    },
+                    "numberType": {
+                        "type": "string",
+                        "title": "Type of the Quality Metric",
+                        "description": "type of the quality metric",
+                        "enum": [
+                            "string",
+                            "integer",
+                            "float",
+                            "percent"
+                        ]
+                    }
+                }
+            }
+        },
+        "genome_assembly": {
+            "title": "Genome Assembly",
+            "description": "The genome assembly associated with the file",
+            "type": "string",
+            "enum": [
+                "hg19",
+                "GRCh37",
+                "GRCh38"
+            ]
+        },
+        "paired_end": {
+            "title": "Paired End Identifier",
+            "description": "Which pair the file belongs to (if paired end library)",
+            "type": "string",
+            "enum": [
+                "1",
+                "2"
+            ]
+        },
+        "variant_type": {
+            "title": "Variant Type",
+            "description": "The variant type associated with this file",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "string",
+            "enum": [
+                "SNV",
+                "SV",
+                "CNV"
+            ]
+        },
+        "override_lab_name": {
+            "description": "The lab that did the experiment if not the attributed Lab from whence this file",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        },
+        "override_experiment_type": {
+            "description": "The type of experiment to which this file is associated",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        },
+        "override_biosource_name": {
+            "description": "The name of the cell line or tissue sample for this track",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        },
+        "override_assay_info": {
+            "description": "Information that helps distinguish the assay eg. ChIP-seq target or repliseq phase",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        },
+        "override_replicate_info": {
+            "description": "Information on which replicate this file belongs",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        },
+        "override_experiment_bucket": {
+            "description": "Where does a file sit in an experiment or set",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        },
+        "override_dataset": {
+            "description": "What dataset does the file belong to",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        },
+        "override_condition": {
+            "description": "What condition distinguishes the members of a dataset",
+            "type": "string",
+            "permission": "restricted_fields",
+            "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
+        }
+    },
+    "facets": {
+        "file_type": {
+            "title": "File Type",
+            "descripton": "Type or categorization of this file."
+        },
+        "file_format.file_format": {
+            "title": "File Format",
+            "description": "Format of the file, i.e. the file extension."
+        },
+        "file_size": {
+            "title": "File Size",
+            "description": "Filter using range of size of the file",
+            "aggregation_type": "stats",
+            "increments": [
+                1024,
+                10240,
+                1048576,
+                10485760,
+                104857600,
+                1073741824,
+                10737418240,
+                107374182400
+            ],
+            "disabled": false,
+            "comment": "disabled flag may be removed once we (a) can handle ?field=val1-to-val2 (ranges) in filters and (b) send ranges from FacetList to search URI."
+        },
+        "date_created": {
+            "title": "Date Created",
+            "aggregation_type": "date_histogram",
+            "disabled": true,
+            "comment": "disabled flag may be removed after we can handle ranges in URI filters."
+        }
+    },
+    "columns": {
+        "file_type": {
+            "title": "File Type"
+        },
+        "file_format.file_format": {
+            "title": "File Format"
+        },
+        "file_size": {
+            "title": "File Size",
+            "default_hidden": false
+        },
+        "date_created": {
+            "default_hidden": true
+        },
+        "last_modified.date_modified": {
+            "default_hidden": true
+        }
+    }
+}

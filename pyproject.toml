@@ -1,0 +1,119 @@
+[tool.poetry]
+name = "encoded-core"
+version = "0.0.1"
+description = "Core data models for Park Lab ENCODE based projects"
+authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
+license = "MIT"
+readme = "README.rst"
+homepage = "https://github.com/smaht-dac/encoded-core"
+repository = "https://github.com/smaht-dac/encoded-core"
+documentation = "https://github.com/smaht-dac/encoded-core"
+packages = [
+  { include="encoded_core", from="src" }
+]
+classifiers = [
+    # How mature is this project? Common values are
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    'Development Status :: 3 - Alpha',
+
+    # Indicate who your project is intended for
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Framework :: Pyramid',
+
+    # Pick your license as you wish (should match "license" above)
+    'License :: OSI Approved :: MIT License',
+    'Topic :: Database :: Database Engines/Servers',
+
+    # Specify the Python versions you support here. In particular, ensure
+    # that you indicate whether you support Python 2, Python 3 or both.
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8.1,<3.10"
+awscli = ">=1.25.36"
+boto3 = "^1.24.36"
+botocore = "^1.27.36"
+dcicsnovault = "^8.0.1.0b3"
+dcicutils = "^7.0.0"
+elasticsearch = "7.13.4"
+jsonschema_serialize_fork = "^2.1.1"
+plaster-pastedeploy = "0.6"
+psycopg2-binary = "^2.9.3"
+PyJWT = "^2.6.0"
+pyramid = "1.10.4"
+pyramid_localroles = ">=0.1,<1"
+pyramid-multiauth = ">=0.9.0,<1"
+pyramid-retry = "^1.0"
+pyramid-tm = "^2.4"
+pyramid_translogger = "^0.1"
+requests = "^2.23.0"
+SPARQLWrapper = "^1.8.5"
+SQLAlchemy = "1.4.41"  # Pinned because >=1.3.17 is broken for us (circular constraints prevent deletes)
+structlog = ">=19.2.0,<20"
+subprocess-middleware = "^0.3.0"
+supervisor = "^4.2.4"
+# Useful for picking apart pyproject.toml
+toml = ">=0.10.1,<1"
+transaction = "^3.0.0"
+translationstring = "1.3"
+uptime = ">=3.0.1,<4"
+urllib3 = "^1.26.4"
+venusian = "^1.2.0"
+waitress = "^2.1.1"
+WebOb = "^1.8.7"
+WebTest = "^2.0.35"
+WSGIProxy2 = "0.4.2"
+"zope.deprecation" = "^4.4.0"
+"zope.interface" = "^4.7.2"
+"zope.sqlalchemy" = "1.6"
+
+[tool.poetry.dev-dependencies]
+# PyCharm says boto3-stubs contains useful type hints
+boto3-stubs = "^1.24.36"
+botocore-stubs = "^1.27.36"
+coverage = ">=6.2"
+codacy-coverage = ">=1.3.11"
+coveralls = ">=3.3.1"
+docutils = ">=0.16,<1"
+flake8 = ">=3.9.0"
+flaky = ">=3.7.0"
+# flask only for moto[server]
+flask = ">=2.0.3"
+# Upon removal of moto[server] we seem to be able to tolerate newer moto versions
+moto = "4.0.3"
+pip-licenses = "^3.3.1"
+pipdeptree = "^2.1.0"
+# TODO: Investigate whether a major version upgrade is allowable for 'pytest', which is several versions behind.
+pytest = ">=7,<8"
+pytest-cov = ">=2.2.1"
+pytest-instafail = ">=0.3.0"
+pytest-mock = ">=0.11.0"
+pytest-timeout = ">=1.0.0"
+pytest-xdist = ">=1.14"
+wheel = ">=0.29.0"
+
+[tool.poetry.scripts]
+# dcicutils commands
+add-image-tag = "dcicutils.ecr_scripts:add_image_tag_main"
+show-global-env-bucket = "dcicutils.env_scripts:show_global_env_bucket_main"
+show-image-manifest = "dcicutils.ecr_scripts:show_image_manifest_main"
+show-image-catalog = "dcicutils.ecr_scripts:show_image_catalog_main"
+unrelease-most-recent-image = "dcicutils.ecr_scripts:unrelease_most_recent_image_main"
+
+[paste.app_factory]
+main = "encoded_core:main"
+
+[paste.composite_factory]
+indexer = "snovault.elasticsearch.es_index_listener:composite"
+
+[paste.filter_app_factory]
+memlimit = "snovault.memlimit:filter_app"
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
