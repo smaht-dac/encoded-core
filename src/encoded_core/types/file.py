@@ -157,8 +157,6 @@ def _build_file_embedded_list():
         "quality_metric.@type",
         "quality_metric.qc_list.qc_type",
         "quality_metric.qc_list.value.uuid",
-
-        "project.lifecycle_management_active"
     ]
 
 

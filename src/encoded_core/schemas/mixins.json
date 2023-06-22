@@ -374,14 +374,6 @@
             }
         }
     },
-    "facets_common": {
-        "project.display_title": {
-            "title": "Project"
-        },
-        "institution.display_title": {
-            "title": "Institution"
-        }
-    },
     "supplementary_files": {
         "other_processed_files": {
             "title": "Supplementary Processed Files",

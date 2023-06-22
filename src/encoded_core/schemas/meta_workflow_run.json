@@ -255,12 +255,6 @@
                     "type": "string",
                     "format": "uuid"
                 },
-                "project": {
-                    "title": "Project",
-                    "description": "Project associated with the MWFR",
-                    "type": "string",
-                    "format": "uuid"
-                },
                 "associated_meta_workflow_runs": {
                     "title": "Associated MetaWorkflowRuns",
                     "description": "The MetaWorkflowRuns that produced this item",
