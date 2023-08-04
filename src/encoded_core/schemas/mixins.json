@@ -463,5 +463,10 @@
                 "linkTo": "FileProcessed"
             }
         }
+    },
+    "facets_common": {
+        "stub.display_title": {
+            "title": "Stub"
+        }
     }
 }
