@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.0.4
+=====
+
+* Port DRS implementation from fourfront
+
+
 0.0.3
 =====
 
