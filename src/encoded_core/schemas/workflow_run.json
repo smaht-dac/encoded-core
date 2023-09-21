@@ -20,6 +20,9 @@
             "$ref": "mixins.json#/aliases"
         },
         {
+            "$ref": "mixins.json#/description"
+        },
+        {
             "$ref": "mixins.json#/uuid"
         },
         {
@@ -55,11 +58,6 @@
             "description": "The preferred viewable name of the run of the workflow.",
             "type": "string"
         },
-        "description": {
-            "title": "Description",
-            "description": "A plain text description of the task.",
-            "type": "string"
-        },
         "metadata_only": {
             "title": "File Provenance Graph",
             "description": "When True the file provenance graph was generated without a run of a 4dn-dcic pipeline.",
@@ -78,6 +76,7 @@
             "title": "Input files",
             "description": "The files used as initial input for the workflow.",
             "type": "array",
+            "minItems": 1,
             "items": {
                 "title": "Input file mapping",
                 "description": "Info on file used as input and mapping to CWL argument for the workflow.",
@@ -124,11 +123,12 @@
             "title": "Output files",
             "description": "All files that are saved as output of the workflow",
             "type": "array",
+            "minItems": 1,
             "items": {
                 "title": "Output file mapping",
                 "description": "Info on file output by the workflow and how it is mapped to CWL arguments.",
                 "type": "object",
-                "additionalProperties": true,
+                "additionalProperties": false,
                 "properties": {
                     "workflow_argument_name": {
                         "title": "Workflow argument name",
@@ -154,6 +154,7 @@
             "title": "parameters",
             "description": "Parameters of the workflow run",
             "type": "array",
+            "minItems": 1,
             "items": {
                 "title": "Parameter",
                 "type": "object",

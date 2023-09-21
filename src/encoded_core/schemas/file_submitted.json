@@ -1,6 +1,6 @@
 {
     "title": "Submitted file",
-    "description": "File submitted to ENCODED",
+    "description": "File submitted by a user",
     "$id": "/profiles/file_submitted.json",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
@@ -8,38 +8,32 @@
         "file_format"
     ],
     "identifyingProperties": [
-        "uuid",
         "accession",
-        "aliases"
+        "aliases",
+        "uuid"
     ],
     "additionalProperties": false,
     "mixinProperties": [
         {
-            "$ref": "mixins.json#/schema_version"
-        },
-        {
-            "$ref": "mixins.json#/uuid"
-        },
-        {
-            "$ref": "mixins.json#/submitted"
-        },
-        {
-            "$ref": "mixins.json#/modified"
+            "$ref": "mixins.json#/accession"
         },
         {
             "$ref": "mixins.json#/aliases"
         },
         {
-            "$ref": "mixins.json#/accession"
+            "$ref": "mixins.json#/modified"
         },
         {
-            "$ref": "mixins.json#/dbxrefs"
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
         },
         {
             "$ref": "mixins.json#/tags"
         },
         {
-            "$ref": "mixins.json#/static_embeds"
+            "$ref": "mixins.json#/uuid"
         },
         {
             "$ref": "file.json#/properties"

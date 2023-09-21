@@ -1,6 +1,6 @@
 {
     "title": "Processed file from workflow runs",
-    "description": "Files produced by CGAP pipelines.",
+    "description": "Files produced by bioinformatics pipelines.",
     "$id": "/profiles/file_processed.json",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
@@ -8,38 +8,32 @@
         "file_format"
     ],
     "identifyingProperties": [
-        "uuid",
         "accession",
-        "aliases"
+        "aliases",
+        "uuid"
     ],
     "additionalProperties": false,
     "mixinProperties": [
         {
-            "$ref": "mixins.json#/schema_version"
-        },
-        {
-            "$ref": "mixins.json#/uuid"
-        },
-        {
-            "$ref": "mixins.json#/submitted"
-        },
-        {
-            "$ref": "mixins.json#/modified"
+            "$ref": "mixins.json#/accession"
         },
         {
             "$ref": "mixins.json#/aliases"
         },
         {
-            "$ref": "mixins.json#/accession"
+            "$ref": "mixins.json#/modified"
         },
         {
-            "$ref": "mixins.json#/dbxrefs"
+            "$ref": "mixins.json#/schema_version"
         },
         {
-            "$ref": "mixins.json#/static_embeds"
+            "$ref": "mixins.json#/submitted"
         },
         {
             "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
         },
         {
             "$ref": "file.json#/properties"
@@ -57,134 +51,104 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "3"
+            "default": "1"
+        },
+        "associated_meta_workflow_runs": {
+            "description": "The MetaWorkflowRuns that produced this item",
+            "items": {
+                "format": "uuid",
+                "title": "Associated MetaWorkflowRun",
+                "type": "string"
+            },
+            "title": "Associated MetaWorkflowRuns",
+            "type": "array"
+        },
+        "disable_wfr_inputs": {
+            "description": "Do not compute workflow_run_inputs field for files used as control",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "title": "Disable wfr inputs field",
+            "type": "boolean"
+        },
+        "file_classification": {
+            "default": "processed file",
+            "enum": [
+                "processed file"
+            ],
+            "title": "General Classification",
+            "type": "string"
+        },
+        "file_ingestion_error": {
+            "description": "This field is set when an error occurred in ingestion with the first error encountered",
+            "items": {
+                "properties": {
+                    "body": {
+                        "index": false,
+                        "type": "string"
+                    },
+                    "row": {
+                        "type": "integer"
+                    }
+                },
+                "title": "Ingestion Error",
+                "type": "object"
+            },
+            "title": "Ingestion Error Report",
+            "type": "array"
+        },
+        "file_ingestion_status": {
+            "description": "Whether or not this processed file has been ingested, if applicable",
+            "enum": [
+                "Error",
+                "In progress",
+                "Ingested",
+                "Ingestion disabled",
+                "N/A",
+                "Queued",
+                "Waiting"
+            ],
+            "title": "Ingestion Status",
+            "type": "string"
+        },
+        "file_type": {
+            "description": "The type of file based on the information in the file",
+            "suggested_enum": [
+                "Higlass SV VCF",
+                "alignments",
+                "full annotated VCF",
+                "gVCF",
+                "image",
+                "intermediate file",
+                "other",
+                "raw VCF"
+            ],
+            "title": "File Type"
+        },
+        "higlass_file": {
+            "description": "Whether file is used for HiGlass",
+            "title": "File for HiGlass Display",
+            "type": "boolean"
         },
         "higlass_uid": {
             "title": "Higlass UID",
             "type": "string"
         },
-        "file_type": {
-            "title": "File Type",
-            "description": "The type of file based on the information in the file.",
-            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
-            "suggested_enum": [
-                "alignments",
-                "image",
-                "other",
-                "intermediate file",
-                "raw VCF",
-                "gVCF",
-                "Higlass SV VCF",
-                "full annotated VCF"
-            ]
-        },
-        "file_ingestion_status": {
-            "title": "Ingestion Status",
-            "description": "Whether or not this processed file has been ingested, if applicable.",
-            "type": "string",
-            "enum": [
-                "N/A",
-                "Waiting",
-                "Queued",
-                "In progress",
-                "Ingested",
-                "Ingestion disabled",
-                "Error"
-            ]
-        },
-        "file_ingestion_error": {
-            "title": "Ingestion Error Report",
-            "description": "This field is set when an error occurred in ingestion with the first error encountered",
-            "type": "array",
-            "items": {
-                "title": "Ingestion Error",
-                "type": "object",
-                "properties": {
-                    "body": {
-                        "type": "string",
-                        "index": false
-                    },
-                    "row": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "file_classification": {
-            "title": "General Classification",
-            "type": "string",
-            "default": "processed file",
-            "exclude_from": [
-                "FFedit-create"
-            ],
-            "enum": [
-                "processed file"
-            ]
-        },
-        "source_samples": {
-            "title": "Source Samples",
-            "description": "Samples that this file is associated with",
-            "type": "array",
-            "lookup": 40,
-            "items": {
-                "title": "Source Sample",
-                "type": "string"
-            }
-        },
-        "genome_assembly": {
-            "default": "GRCh38"
-        },
         "produced_from": {
-            "title": "Produced From",
-            "description": "Files that were input in a software or pipeline to produce this file",
-            "type": "array",
-            "lookup": 35,
+            "description": "Files that were input to produce this file",
             "items": {
+                "linkTo": "File",
                 "title": "Input File",
                 "type": "string"
-            }
-        },
-        "disable_wfr_inputs": {
-            "title": "Disable wfr inputs field",
-            "description": "Do not compute workflow_run_inputs field for files used as control",
-            "type": "boolean",
-            "exclude_from": [
-                "FFedit-create"
-            ]
-        },
-        "linkto_location": {
-            "title": "LinkTo Location",
-            "description": "Location on which to place a linkTo for this file",
-            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            },
+            "minItems": 1,
+            "title": "Produced From",
             "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [
-                    "Sample",
-                    "SampleProcessing"
-                ]
-            }
-        },
-        "associated_meta_workflow_runs": {
-            "title": "Associated MetaWorkflowRuns",
-            "description": "The MetaWorkflowRuns that produced this item",
-            "type": "array",
-            "items": {
-                "title": "Associated MetaWorkflowRun",
-                "type": "string",
-                "format": "uuid"
-            }
+            "uniqueItems": true
         },
         "vcf_to_ingest": {
-            "title": "VCF to Ingest",
             "description": "Whether file is a VCF with contents to ingest",
-            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
-            "type": "boolean"
-        },
-        "higlass_file": {
-            "title": "File for HiGlass Display",
-            "description": "Whether file is used for HiGlass",
-            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "title": "VCF to Ingest",
             "type": "boolean"
         }
     },
