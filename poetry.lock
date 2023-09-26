@@ -868,20 +868,20 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "dcicsnovault"
-version = "10.0.4.1b15"
+version = "10.0.4.1b17"
 description = "Storage support for 4DN Data Portals."
 optional = false
 python-versions = ">=3.8.1,<3.12"
 files = [
-    {file = "dcicsnovault-10.0.4.1b15-py3-none-any.whl", hash = "sha256:206c1d800844666c83bdbdd349ca87eb89bda94f22e355f0282528c0a1e2b34f"},
-    {file = "dcicsnovault-10.0.4.1b15.tar.gz", hash = "sha256:8ed2739be495d897dc41deb36c6179f9e3b691598080f753016c9139600bc5c4"},
+    {file = "dcicsnovault-10.0.4.1b17-py3-none-any.whl", hash = "sha256:ac0ef9bff3d790b26eb6f167c7f38f1ac550bed2daa5e7e7792e88ca98614973"},
+    {file = "dcicsnovault-10.0.4.1b17.tar.gz", hash = "sha256:8c8e3fd44094d597904cbf361d35bdafcf0b08df53a0dbeb0f380b1f710cd2fb"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
-boto3 = ">=1.28.52"
-botocore = ">=1.28.52"
-dcicutils = "7.12.0.2b3"
+boto3 = ">=1.28.54"
+botocore = ">=1.31.54"
+dcicutils = "7.12.0.2b6"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
 future = ">=0.15.2,<1"
@@ -924,19 +924,19 @@ xlrd = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "dcicutils"
-version = "7.12.0.2b3"
+version = "7.12.0.2b6"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 optional = false
 python-versions = ">=3.8,<3.12"
 files = [
-    {file = "dcicutils-7.12.0.2b3-py3-none-any.whl", hash = "sha256:a387d69f9e3f0046ae228c6049c9c3321034338da8f2fd8a412c46e88782c64a"},
-    {file = "dcicutils-7.12.0.2b3.tar.gz", hash = "sha256:9cddc6b62c3c9c8d7d0b6b74e9b948e6b0a11cac519fc4c7e3b7db76e99acbb9"},
+    {file = "dcicutils-7.12.0.2b6-py3-none-any.whl", hash = "sha256:6e03e4d168f7056d4db4ebf7ec6c0367af62c9a2d36ba9808b20ed1ead875752"},
+    {file = "dcicutils-7.12.0.2b6.tar.gz", hash = "sha256:1e499d539bef10d955ed1303530f74a5207aef7b454829ab5eedee7a76e2b7a2"},
 ]
 
 [package.dependencies]
 aws-requests-auth = ">=0.4.2,<1"
-boto3 = ">=1.28.51,<2.0.0"
-botocore = ">=1.31.51,<2.0.0"
+boto3 = ">=1.28.54,<2.0.0"
+botocore = ">=1.31.54,<2.0.0"
 docker = ">=4.4.4,<5.0.0"
 elasticsearch = "7.13.4"
 gitpython = ">=3.1.2,<4.0.0"
@@ -3391,4 +3391,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.12"
-content-hash = "bacc512022807bac8b03d4da0ee57f5633e29118fab68250200f21a9dc0347d7"
+content-hash = "a64dbad327e38f4d7f8d8bbc545bd74202b2b08a327d9168d3b8f76f378b1ae7"
