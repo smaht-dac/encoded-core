@@ -6,6 +6,13 @@ encoded-core
 Change Log
 ----------
 
+0.1.0
+=====
+
+* Upgrade to Python 3.11.
+
+
+
 0.0.4
 =====
 

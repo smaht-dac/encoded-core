@@ -13,6 +13,13 @@ test-any:
 test:
 	make test-any
 
+publish:
+	poetry run publish-to-pypi
+
+publish-for-ga:
+	poetry install
+	poetry run publish-to-pypi --noconfirm
+
 remote-test:
 	poetry run python -m pytest -xvv -r w --timeout=200 --es search-fourfront-testing-opensearch-kqm7pliix4wgiu4druk2indorq.us-east-1.es.amazonaws.com:443
 
