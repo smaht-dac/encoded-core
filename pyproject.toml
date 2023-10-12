@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "encoded-core"
-version = "0.0.4"
+version = "0.1.0"
 description = "Core data models for Park Lab ENCODE based projects"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -31,19 +31,22 @@ classifiers = [
     # that you indicate whether you support Python 2, Python 3 or both.
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<3.10"
-awscli = ">=1.25.36"
-boto3 = "^1.24.36"
-botocore = "^1.27.36"
+python = ">=3.8.1,<3.12"
+awscli = ">=1.29.62"
+boto3 = "^1.28.62"
+botocore = "^1.31.62"
 dcicsnovault = "^11.0.0"
 dcicutils = "^8.0.0"
 elasticsearch = "7.13.4"
 plaster-pastedeploy = "0.6"
 psycopg2-binary = "^2.9.3"
 PyJWT = "^2.6.0"
+PyYAML = "^6.0.1"
 pyramid = "1.10.4"
 pyramid_localroles = ">=0.1,<1"
 pyramid-multiauth = ">=0.9.0,<1"
@@ -73,8 +76,8 @@ WSGIProxy2 = "0.4.2"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = "^1.24.36"
-botocore-stubs = "^1.27.36"
+boto3-stubs = "^1.28.62"
+botocore-stubs = "^1.31.62"
 coverage = ">=6.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.3.1"
@@ -99,6 +102,7 @@ wheel = ">=0.29.0"
 [tool.poetry.scripts]
 # dcicutils commands
 add-image-tag = "dcicutils.ecr_scripts:add_image_tag_main"
+publish-to-pypi = "dcicutils.scripts.publish_to_pypi:main"
 show-global-env-bucket = "dcicutils.env_scripts:show_global_env_bucket_main"
 show-image-manifest = "dcicutils.ecr_scripts:show_image_manifest_main"
 show-image-catalog = "dcicutils.ecr_scripts:show_image_catalog_main"
