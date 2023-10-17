@@ -126,15 +126,12 @@
                     "title": "List Styles",
                     "description": "CSS list styles used for <li> elements.",
                     "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
                     "items": {
                         "type": "string"
                     }
                 }
-            },
-            "default": {
-                "enabled": false,
-                "include-top-link": false,
-                "header-depth": 4
             }
         },
         "title": {
