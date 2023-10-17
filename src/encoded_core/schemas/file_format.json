@@ -123,7 +123,7 @@
             "uniqueItems": true
         },
         "standard_file_extension": {
-            "description": "The standard extension added to files for download",
+            "description": "Standard extension added to files for download",
             "permission": "restricted_fields",
             "title": "Standard File Extension",
             "type": "string"
