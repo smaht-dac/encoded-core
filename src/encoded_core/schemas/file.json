@@ -49,6 +49,7 @@
         },
         "status": {
             "default": "uploading",
+            "type": "string",
             "enum": [
                 "uploading",
                 "uploaded",
