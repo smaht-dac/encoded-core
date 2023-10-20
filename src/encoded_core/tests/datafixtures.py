@@ -14,7 +14,7 @@ def file_formats(testapp):
     format_info = {
         'fastq': {'standard_file_extension': 'fastq.gz',
                   'other_allowed_extensions': ['fq.gz'],
-                  "valid_item_types": ["FileFastq", "FileSubmitted"]},
+                  "valid_item_types": ["FileSubmitted"]},
         'bam': {'standard_file_extension': 'bam',
                 'extrafile_formats': ['bai'],
                 "valid_item_types": ["FileProcessed"]},
@@ -176,7 +176,6 @@ def sample_workflow_run(testapp, file_formats, workflows, sample_file):
     return testapp.post_json('/WorkflowRunAwsem', {
         "title": "xtea v1.1.0 run 2023-04-17 21:02:32.148147",
         "workflow": "fcdad1d6-80b7-4acd-bac8-d954540883c4",
-        "parameters": [],
         "run_status": "complete",
         "input_files": [
             {

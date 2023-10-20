@@ -26,9 +26,6 @@
             "$ref": "mixins.json#/submitted"
         },
         {
-            "$ref": "mixins.json#/status"
-        },
-        {
             "$ref": "mixins.json#/modified"
         },
         {
@@ -40,6 +37,9 @@
             "default": "1"
         },
         "status": {
+            "title": "Status",
+            "type": "string",
+            "permission": "restricted_fields",
             "default": "current",
             "enum": [
                 "public",
