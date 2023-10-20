@@ -6,6 +6,13 @@ encoded-core
 Change Log
 ----------
 
+
+0.2.0
+=====
+
+* Merging in Doug's drr_schema_updates branch.
+
+
 0.1.0
 =====
 
