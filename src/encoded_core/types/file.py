@@ -31,6 +31,18 @@ logging.getLogger('boto3').setLevel(logging.CRITICAL)
 
 log = structlog.getLogger(__name__)
 
+
+HREF_SCHEMA = {
+    "title": "Download URL",
+    "type": "string",
+    "description": "Use this link to download this file"
+}
+UPLOAD_KEY_SCHEMA = {
+    "title": "Upload Key",
+    "type": "string",
+    "description": "File object name in S3",
+}
+
 file_workflow_run_embeds = [
     'workflow_run_inputs.workflow.title',
     'workflow_run_inputs.input_files.workflow_argument_name',
@@ -387,11 +399,7 @@ class File(Item):
     def title(self, accession=None, external_accession=None):
         return accession or external_accession
 
-    @calculated_property(schema={
-        "title": "Download URL",
-        "type": "string",
-        "description": "Use this link to download this file."
-    })
+    @calculated_property(schema=HREF_SCHEMA)
     def href(self, request, file_format, accession=None, external_accession=None):
         fformat = get_item_or_none(request, file_format, 'file-formats')
         try:
@@ -402,10 +410,7 @@ class File(Item):
         filename = '{}{}'.format(accession, file_extension)
         return request.resource_path(self) + '@@download/' + filename
 
-    @calculated_property(schema={
-        "title": "Upload Key",
-        "type": "string",
-    })
+    @calculated_property(schema=UPLOAD_KEY_SCHEMA)
     def upload_key(self, request):
         properties = self.properties
         external = self.propsheets.get('external', {})
