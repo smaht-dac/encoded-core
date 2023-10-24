@@ -67,7 +67,7 @@ file_workflow_run_embeds_processed = (file_workflow_run_embeds
 
 
 def show_upload_credentials(request=None, context=None, status=None):
-    if request is None or status not in ('uploading', 'to be uploaded by workflow', 'upload failed'):
+    if request is None or status not in File.SHOW_UPLOAD_CREDENTIALS_STATUSES:
         return False
     return request.has_permission('edit', context)
 
@@ -485,7 +485,7 @@ class File(Item):
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
-        if properties.get('status') in ('uploading', 'to be uploaded by workflow'):
+        if properties.get('status') in cls.SHOW_UPLOAD_CREDENTIALS_STATUSES:
             sheets = {} if sheets is None else sheets.copy()
             sheets['external'] = cls.build_external_creds(registry, uuid, properties)
         return super(File, cls).create(registry, uuid, properties, sheets)
