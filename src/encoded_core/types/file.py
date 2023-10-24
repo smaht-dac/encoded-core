@@ -37,6 +37,7 @@ HREF_SCHEMA = {
     "type": "string",
     "description": "Use this link to download this file"
 }
+UNMAPPED_OBJECT_SCHEMA = {"type": "object"}
 UPLOAD_KEY_SCHEMA = {
     "title": "Upload Key",
     "type": "string",
@@ -423,17 +424,17 @@ class File(Item):
                 return 'UPLOAD KEY FAILED'
         return external['key']
 
-    @calculated_property(condition=show_upload_credentials, schema={
-        "type": "object",
-    })
+    @calculated_property(
+        condition=show_upload_credentials, schema=UNMAPPED_OBJECT_SCHEMA
+    )
     def upload_credentials(self):
         external = self.propsheets.get('external', None)
         if external is not None:
             return external['upload_credentials']
 
-    @calculated_property(condition=show_upload_credentials, schema={
-        "type": "object",
-    })
+    @calculated_property(
+        condition=show_upload_credentials, schema=UNMAPPED_OBJECT_SCHEMA
+    )
     def extra_files_creds(self):
         external = self.propsheets.get('external', None)
         if external is not None:
