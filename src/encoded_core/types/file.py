@@ -31,6 +31,19 @@ logging.getLogger('boto3').setLevel(logging.CRITICAL)
 
 log = structlog.getLogger(__name__)
 
+
+HREF_SCHEMA = {
+    "title": "Download URL",
+    "type": "string",
+    "description": "Use this link to download this file"
+}
+UNMAPPED_OBJECT_SCHEMA = {"type": "object"}
+UPLOAD_KEY_SCHEMA = {
+    "title": "Upload Key",
+    "type": "string",
+    "description": "File object name in S3",
+}
+
 file_workflow_run_embeds = [
     'workflow_run_inputs.workflow.title',
     'workflow_run_inputs.input_files.workflow_argument_name',
@@ -54,7 +67,7 @@ file_workflow_run_embeds_processed = (file_workflow_run_embeds
 
 
 def show_upload_credentials(request=None, context=None, status=None):
-    if request is None or status not in ('uploading', 'to be uploaded by workflow', 'upload failed'):
+    if request is None or status not in File.SHOW_UPLOAD_CREDENTIALS_STATUSES:
         return False
     return request.has_permission('edit', context)
 
@@ -174,6 +187,10 @@ class File(Item):
     schema = load_schema('encoded_core:schemas/file.json')
     embedded_list = _build_file_embedded_list()
 
+    SHOW_UPLOAD_CREDENTIAL_STATUSES = (
+        'uploading', 'to be uploaded by workflow', 'upload failed'
+    )
+
     @calculated_property(schema={
         "title": "Display Title",
         "description": "Name of this File",
@@ -243,8 +260,7 @@ class File(Item):
         new_creds = old_creds
 
         # don't get new creds
-        if properties.get('status', None) in ('uploading', 'to be uploaded by workflow',
-                                              'upload failed'):
+        if properties.get('status', None) in self.SHOW_UPLOAD_CREDENTIAL_STATUSES:
             new_creds = self.build_external_creds(self.registry, uuid, properties)
             sheets['external'] = new_creds
 
@@ -387,11 +403,7 @@ class File(Item):
     def title(self, accession=None, external_accession=None):
         return accession or external_accession
 
-    @calculated_property(schema={
-        "title": "Download URL",
-        "type": "string",
-        "description": "Use this link to download this file."
-    })
+    @calculated_property(schema=HREF_SCHEMA)
     def href(self, request, file_format, accession=None, external_accession=None):
         fformat = get_item_or_none(request, file_format, 'file-formats')
         try:
@@ -402,10 +414,7 @@ class File(Item):
         filename = '{}{}'.format(accession, file_extension)
         return request.resource_path(self) + '@@download/' + filename
 
-    @calculated_property(schema={
-        "title": "Upload Key",
-        "type": "string",
-    })
+    @calculated_property(schema=UPLOAD_KEY_SCHEMA)
     def upload_key(self, request):
         properties = self.properties
         external = self.propsheets.get('external', {})
@@ -418,17 +427,17 @@ class File(Item):
                 return 'UPLOAD KEY FAILED'
         return external['key']
 
-    @calculated_property(condition=show_upload_credentials, schema={
-        "type": "object",
-    })
+    @calculated_property(
+        condition=show_upload_credentials, schema=UNMAPPED_OBJECT_SCHEMA
+    )
     def upload_credentials(self):
         external = self.propsheets.get('external', None)
         if external is not None:
             return external['upload_credentials']
 
-    @calculated_property(condition=show_upload_credentials, schema={
-        "type": "object",
-    })
+    @calculated_property(
+        condition=show_upload_credentials, schema=UNMAPPED_OBJECT_SCHEMA
+    )
     def extra_files_creds(self):
         external = self.propsheets.get('external', None)
         if external is not None:
@@ -476,7 +485,7 @@ class File(Item):
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
-        if properties.get('status') in ('uploading', 'to be uploaded by workflow'):
+        if properties.get('status') in cls.SHOW_UPLOAD_CREDENTIALS_STATUSES:
             sheets = {} if sheets is None else sheets.copy()
             sheets['external'] = cls.build_external_creds(registry, uuid, properties)
         return super(File, cls).create(registry, uuid, properties, sheets)
