@@ -187,7 +187,7 @@ class File(Item):
     schema = load_schema('encoded_core:schemas/file.json')
     embedded_list = _build_file_embedded_list()
 
-    SHOW_UPLOAD_CREDENTIAL_STATUSES = (
+    SHOW_UPLOAD_CREDENTIALS_STATUSES = (
         'uploading', 'to be uploaded by workflow', 'upload failed'
     )
 
@@ -260,7 +260,7 @@ class File(Item):
         new_creds = old_creds
 
         # don't get new creds
-        if properties.get('status', None) in self.SHOW_UPLOAD_CREDENTIAL_STATUSES:
+        if properties.get('status', None) in self.SHOW_UPLOAD_CREDENTIALS_STATUSES:
             new_creds = self.build_external_creds(self.registry, uuid, properties)
             sheets['external'] = new_creds
 
