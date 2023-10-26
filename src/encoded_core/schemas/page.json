@@ -123,6 +123,12 @@
                     "type": "integer",
                     "default": 4
                 },
+                "skip-depth": {
+                    "title": "Skip Depth",
+                    "description": "TODO",
+                    "type": "integer",
+                    "default": 1
+                },
                 "list-styles": {
                     "title": "List Styles",
                     "description": "CSS list styles used for <li> elements.",
@@ -132,6 +138,12 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "include-top-link": {
+                    "title": "Inlude Top Link",
+                    "description": "TODO",
+                    "type": "boolean",
+                    "default": false
                 }
             }
         },
