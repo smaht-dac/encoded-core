@@ -121,6 +121,8 @@
                     "title": "Header Depth",
                     "description": "Maximum depth for table of contents titles, 1-6",
                     "type": "integer",
+                    "minimum": 1,
+                    "maximum": 6,
                     "default": 4
                 },
                 "skip-depth": {
@@ -136,7 +138,13 @@
                     "minItems": 1,
                     "uniqueItems": true,
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "decimal",
+                            "lower-alpha",
+                            "lower-roman",
+                            "none"
+                        ]
                     }
                 },
                 "include-top-link": {
@@ -154,11 +162,8 @@
         }
     },
     "columns": {
-        "name": {
+        "identifier": {
             "title": "Path Name"
         }
-    },
-    "excludedColumns": [
-        "institution.display_title"
-    ]
+    }
 }
