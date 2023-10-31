@@ -9,7 +9,6 @@
     "additionalProperties": false,
     "identifyingProperties": [
         "uuid",
-        "name",
         "aliases"
     ],
     "mixinProperties": [
@@ -136,8 +135,5 @@
         "section_type": {
             "title": "Type"
         }
-    },
-    "excludedColumns": [
-        "lab.display_title"
-    ]
+    }
 }
