@@ -1,5 +1,5 @@
 {
-    "title": "Reference file",
+    "title": "Reference File",
     "description": "Files used in pipelines as references.",
     "$id": "/profiles/file_reference.json",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -8,38 +8,32 @@
         "file_format"
     ],
     "identifyingProperties": [
-        "uuid",
         "accession",
-        "aliases"
+        "aliases",
+        "uuid"
     ],
     "additionalProperties": false,
     "mixinProperties": [
         {
-            "$ref": "mixins.json#/schema_version"
-        },
-        {
-            "$ref": "mixins.json#/uuid"
-        },
-        {
-            "$ref": "mixins.json#/submitted"
-        },
-        {
-            "$ref": "mixins.json#/modified"
+            "$ref": "mixins.json#/accession"
         },
         {
             "$ref": "mixins.json#/aliases"
         },
         {
-            "$ref": "mixins.json#/accession"
+            "$ref": "mixins.json#/modified"
         },
         {
-            "$ref": "mixins.json#/dbxrefs"
+            "$ref": "mixins.json#/schema_version"
         },
         {
-            "$ref": "mixins.json#/static_embeds"
+            "$ref": "mixins.json#/submitted"
         },
         {
             "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
         },
         {
             "$ref": "file.json#/properties"
@@ -57,14 +51,11 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "2"
-        },
-        "higlass_uid": {
-            "title": "Higlass UID",
-            "type": "string"
+            "default": "1"
         },
         "file_type": {
             "title": "File Type",
+            "type": "string",
             "description": "The type of file based on the information in the file.",
             "enum": [
                 "genome reference",
@@ -85,12 +76,13 @@
             "title": "General Classification",
             "type": "string",
             "default": "ancillary file",
-            "exclude_from": [
-                "FFedit-create"
-            ],
             "enum": [
                 "ancillary file"
             ]
+        },
+        "higlass_uid": {
+            "title": "Higlass UID",
+            "type": "string"
         }
     }
 }

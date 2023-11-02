@@ -6,10 +6,20 @@
     "type": "object",
     "additionalProperties": false,
     "identifyingProperties": [
-        "uuid",
-        "aliases"
+        "aliases",
+        "uuid"
     ],
     "properties": {
+        "associated_meta_workflow_runs": {
+            "title": "Associated MetaWorkflowRuns",
+            "description": "The MetaWorkflowRuns that produced this item",
+            "type": "array",
+            "items": {
+                "title": "Associated MetaWorkflowRun",
+                "type": "string",
+                "format": "uuid"
+            }
+        },
         "overall_quality_status": {
             "description": "Overall QC decision",
             "title": "Overall Quality",
@@ -26,16 +36,6 @@
             "title": "Link to Report",
             "description": "Location of the main html file",
             "format": "uri"
-        },
-        "associated_meta_workflow_runs": {
-            "title": "Associated MetaWorkflowRuns",
-            "description": "The MetaWorkflowRuns that produced this item",
-            "type": "array",
-            "items": {
-                "title": "Associated MetaWorkflowRun",
-                "type": "string",
-                "format": "uuid"
-            }
         }
     },
     "facets": {

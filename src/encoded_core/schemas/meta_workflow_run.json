@@ -9,21 +9,21 @@
     ],
     "additionalProperties": false,
     "identifyingProperties": [
-        "uuid",
-        "aliases"
+        "aliases",
+        "uuid"
     ],
     "mixinProperties": [
-        {
-            "$ref": "mixins.json#/schema_version"
-        },
         {
             "$ref": "mixins.json#/aliases"
         },
         {
-            "$ref": "mixins.json#/uuid"
+            "$ref": "mixins.json#/description"
         },
         {
-            "$ref": "mixins.json#/documents"
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/schema_version"
         },
         {
             "$ref": "mixins.json#/status"
@@ -32,13 +32,10 @@
             "$ref": "mixins.json#/submitted"
         },
         {
-            "$ref": "mixins.json#/static_embeds"
-        },
-        {
             "$ref": "mixins.json#/tags"
         },
         {
-            "$ref": "mixins.json#/modified"
+            "$ref": "mixins.json#/uuid"
         }
     ],
     "mixinFacets": [
@@ -50,99 +47,65 @@
         "schema_version": {
             "default": "1"
         },
-        "title": {
-            "title": "Title",
-            "description": "The preferred viewable name of the meta workflow run.",
-            "type": "string"
-        },
-        "description": {
-            "title": "Description",
-            "description": "A plain text description of the meta-workflow run",
-            "type": "string"
-        },
-        "workflow_runs": {
-            "title": "Workflow Runs",
-            "description": "The list of workflow runs with their status and output files",
-            "type": "array",
-            "items": {
-                "title": "Workflow Run",
-                "description": "Individual workflow run the meta workflow run.",
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                    "name": {
-                        "title": "Name",
-                        "description": "Name of the corresponding workflow defined in the meta-workflow",
-                        "type": "string"
-                    },
-                    "status": {
-                        "title": "Status",
-                        "description": "Status of the current workflow run",
+        "common_fields": {
+            "title": "Common Fields",
+            "description": "Common fields that go into all workflow_run, processed_files and qc items",
+            "comment": "The properties here must be valid for all item types in description above to prevent validation errors",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "associated_meta_workflow_runs": {
+                    "title": "Associated MetaWorkflowRuns",
+                    "description": "The MetaWorkflowRuns that produced this item",
+                    "type": "array",
+                    "items": {
+                        "title": "Associated MetaWorkflowRun",
                         "type": "string",
-                        "enum": [
-                            "pending",
-                            "running",
-                            "completed",
-                            "failed"
-                        ]
-                    },
-                    "shard": {
-                        "title": "Shard",
-                        "description": "Shard of the current workflow run in the format of x (1D) | x:x (2D) | x:x:x (3D)",
-                        "type": "string"
-                    },
-                    "dependencies": {
-                        "title": "Dependencies",
-                        "description": "Dependencies of the current workflow run",
-                        "type": "array",
-                        "items": {
-                            "title": "Dependency",
-                            "description": "A dependency of the current workflow run, in the format of name:shard.",
-                            "type": "string"
-                        }
-                    },
-                    "output": {
-                        "title": "Output",
-                        "description": "Output of the current workflow run",
-                        "type": "array",
-                        "items": {
-                            "title": "Output",
-                            "description": "An output of the current workflow run.",
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "argument_name": {
-                                    "title": "Argument Name",
-                                    "description": "Name of the output argument",
-                                    "type": "string"
-                                },
-                                "file": {
-                                    "title": "File",
-                                    "description": "the actual output file (link to a file item)",
-                                    "type": "string",
-                                    "linkTo": "File"
-                                }
-                            }
-                        }
-                    },
-                    "workflow_run": {
-                        "title": "Workflow Run",
-                        "description": "Link to the corresponding workflow run item",
-                        "type": "string",
-                        "linkTo": "WorkflowRun"
-                    },
-                    "jobid": {
-                        "title": "Job ID",
-                        "description": "Job ID of the current workflow run",
-                        "type": "string"
+                        "format": "uuid"
                     }
                 }
             }
+        },
+        "cost": {
+            "title": "Cost",
+            "description": "Total cost of the meta workflow run (includes failed jobs)",
+            "type": "number"
+        },
+        "failed_jobs": {
+            "title": "Failed Jobs",
+            "description": "List of failed Tibanna job ids for this meta workflow run",
+            "type": "array",
+            "items": {
+                "title": "Failed Job Id",
+                "description": "Failed Tibanna job in this meta workflow run",
+                "type": "string"
+            }
+        },
+        "final_status": {
+            "title": "Final Status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+                "pending",
+                "running",
+                "completed",
+                "failed",
+                "inactive",
+                "stopped",
+                "quality metric failed"
+            ]
+        },
+        "ignore_output_quality_metrics": {
+            "title": "Ignore Output QualityMetrics",
+            "description": "If true, ignore the status of output QualityMetrics",
+            "type": "boolean",
+            "default": false
         },
         "input": {
             "title": "Input",
             "description": "The input files and parameters used for the meta workflow run.",
             "type": "array",
+            "minItems": 1,
             "items": {
                 "title": "Input",
                 "description": "Input files or parameters associated with an input argument of the meta workflow run.",
@@ -184,6 +147,7 @@
                         "title": "File",
                         "description": "Default file item of the file type argument",
                         "type": "array",
+                        "minItems": 1,
                         "items": {
                             "title": "Default Files",
                             "description": "A list of objects describing default input file items",
@@ -213,56 +177,37 @@
             "type": "string",
             "linkTo": "MetaWorkflow"
         },
-        "final_status": {
-            "title": "Final Status",
+        "output_files_linked_status": {
+            "title": "Status of Output File Links",
+            "description": "The status of links created for all output files",
             "type": "string",
-            "default": "pending",
             "enum": [
-                "pending",
-                "running",
-                "completed",
-                "failed",
-                "inactive",
-                "stopped",
-                "quality metric failed"
+                "success",
+                "error"
             ]
         },
-        "failed_jobs": {
-            "title": "Failed Jobs",
-            "description": "List of failed Tibanna job ids for this meta workflow run",
+        "output_files_linked_errors": {
+            "title": "Output File Link Creation Errors",
+            "description": "Output files that could not be linked successfully and their associated errors",
             "type": "array",
+            "minItems": 1,
             "items": {
-                "title": "Failed Job Id",
-                "description": "Failed Tibanna job in this meta workflow run",
-                "type": "string"
-            }
-        },
-        "cost": {
-            "title": "Cost",
-            "description": "Total cost of the meta workflow run (includes failed jobs)",
-            "type": "number"
-        },
-        "common_fields": {
-            "title": "Common Fields",
-            "description": "Common fields that go into all workflow_run, processed_files and qc items",
-            "comment": "The properties here must be valid for all item types in description above to prevent validation errors",
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "institution": {
-                    "title": "Institution",
-                    "description": "Institution associated with the MWFR",
-                    "type": "string",
-                    "format": "uuid"
-                },
-                "associated_meta_workflow_runs": {
-                    "title": "Associated MetaWorkflowRuns",
-                    "description": "The MetaWorkflowRuns that produced this item",
-                    "type": "array",
-                    "items": {
-                        "title": "Associated MetaWorkflowRun",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "output_file": {
+                        "title": "Output File",
+                        "description": "Output file with link error",
                         "type": "string",
-                        "format": "uuid"
+                        "linkTo": "FileProcessed"
+                    },
+                    "errors": {
+                        "title": "Errors",
+                        "description": "Errors that occurred on link creation",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -271,6 +216,7 @@
             "title": "Overall QCs",
             "description": "QC tests for a given pipeline",
             "type": "array",
+            "minItems": 1,
             "items": {
                 "title": "Overall QC",
                 "description": "A list of objects describing QC tests",
@@ -295,57 +241,88 @@
                 }
             }
         },
-        "input_samples": {
-            "title": "Input Samples",
-            "description": "Sample UUIDs (ordered per input files)",
+        "title": {
+            "title": "Title",
+            "description": "The preferred viewable name of the meta workflow run.",
+            "type": "string"
+        },
+        "workflow_runs": {
+            "title": "Workflow Runs",
+            "description": "The list of workflow runs with their status and output files",
             "type": "array",
+            "minItems": 1,
             "items": {
-                "type": "string",
-                "format": "uuid"
-            }
-        },
-        "associated_sample_processing": {
-            "title": "Associated SampleProcessing",
-            "description": "Associated SampleProcessing UUID",
-            "type": "string",
-            "format": "uuid"
-        },
-        "ignore_output_quality_metrics": {
-            "title": "Ignore Output QualityMetrics",
-            "description": "If true, ignore the status of output QualityMetrics",
-            "type": "boolean",
-            "default": false
-        },
-        "output_files_linked_status": {
-            "title": "Status of Output File Links",
-            "description": "The status of links created for all output files",
-            "type": "string",
-            "enum": [
-                "success",
-                "error"
-            ]
-        },
-        "output_files_linked_errors": {
-            "title": "Output File Link Creation Errors",
-            "description": "Output files that could not be linked successfully and their associated errors",
-            "type": "array",
-            "items": {
+                "title": "Workflow Run",
+                "description": "Individual workflow run the meta workflow run.",
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                    "output_file": {
-                        "title": "Output File",
-                        "description": "Output file with link error",
-                        "type": "string",
-                        "linkTo": "FileProcessed"
-                    },
-                    "errors": {
-                        "title": "Errors",
-                        "description": "Errors that occurred on link creation",
+                    "dependencies": {
+                        "title": "Dependencies",
+                        "description": "Dependencies of the current workflow run",
                         "type": "array",
                         "items": {
+                            "title": "Dependency",
+                            "description": "A dependency of the current workflow run, in the format of name:shard.",
                             "type": "string"
                         }
+                    },
+                    "jobid": {
+                        "title": "Job ID",
+                        "description": "Job ID of the current workflow run",
+                        "type": "string"
+                    },
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the corresponding workflow defined in the meta-workflow",
+                        "type": "string"
+                    },
+                    "output": {
+                        "title": "Output",
+                        "description": "Output of the current workflow run",
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "title": "Output",
+                            "description": "An output of the current workflow run.",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "argument_name": {
+                                    "title": "Argument Name",
+                                    "description": "Name of the output argument",
+                                    "type": "string"
+                                },
+                                "file": {
+                                    "title": "File",
+                                    "description": "the actual output file (link to a file item)",
+                                    "type": "string",
+                                    "linkTo": "File"
+                                }
+                            }
+                        }
+                    },
+                    "shard": {
+                        "title": "Shard",
+                        "description": "Shard of the current workflow run in the format of x (1D) | x:x (2D) | x:x:x (3D)",
+                        "type": "string"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Status of the current workflow run",
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "running",
+                            "completed",
+                            "failed"
+                        ]
+                    },
+                    "workflow_run": {
+                        "title": "Workflow Run",
+                        "description": "Link to the corresponding workflow run item",
+                        "type": "string",
+                        "linkTo": "WorkflowRun"
                     }
                 }
             }

@@ -8,66 +8,65 @@
     ],
     "additionalProperties": false,
     "identifyingProperties": [
-        "uuid",
-        "name"
+        "name",
+        "uuid"
     ],
     "mixinProperties": [
         {
-            "$ref": "mixins.json#/schema_version"
+            "$ref": "mixins.json#/modified"
         },
         {
-            "$ref": "mixins.json#/uuid"
+            "$ref": "mixins.json#/schema_version"
         },
         {
             "$ref": "mixins.json#/submitted"
         },
         {
-            "$ref": "mixins.json#/modified"
+            "$ref": "mixins.json#/tags"
         },
         {
-            "$ref": "mixins.json#/tags"
+            "$ref": "mixins.json#/uuid"
         }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
         },
+        "genome_assembly": {
+            "description": "All data files will use this genome assembly.",
+            "enum": [
+                "GRCh38"
+            ],
+            "title": "Genome Assembly",
+            "type": "string"
+        },
+        "instance_height": {
+            "default": 500,
+            "title": "Instance Height",
+            "type": "integer"
+        },
         "name": {
-            "title": "Display name",
             "description": "Display name",
+            "title": "Display name",
             "type": "string"
         },
         "title": {
-            "title": "Display title",
             "description": "Display title",
+            "title": "Display title",
             "type": "string"
         },
-        "genome_assembly": {
-            "title": "Genome Assembly",
-            "description": "All data files will use this genome assembly.",
-            "type": "string",
-            "enum": [
-                "GRCh38"
-            ]
-        },
         "viewconfig": {
-            "title": "View Configuration",
-            "type": "object",
             "additionalProperties": true,
+            "default": {
+                "views": []
+            },
             "description": "The viewconfig JSON",
             "exclude_from": [
                 "FFedit-create"
             ],
-            "lookup": 7,
             "formInput": "code",
-            "default": {
-                "views": []
-            }
-        },
-        "instance_height": {
-            "title": "Instance Height",
-            "type": "integer",
-            "default": 500
+            "title": "View Configuration",
+            "type": "object"
         }
     }
 }

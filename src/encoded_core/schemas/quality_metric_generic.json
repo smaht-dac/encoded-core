@@ -9,33 +9,33 @@
     ],
     "additionalProperties": false,
     "identifyingProperties": [
-        "uuid",
-        "aliases"
+        "aliases",
+        "uuid"
     ],
     "mixinProperties": [
         {
-            "$ref": "mixins.json#/schema_version"
-        },
-        {
-            "$ref": "mixins.json#/uuid"
-        },
-        {
             "$ref": "mixins.json#/aliases"
-        },
-        {
-            "$ref": "mixins.json#/submitted"
         },
         {
             "$ref": "mixins.json#/modified"
         },
         {
-            "$ref": "mixins.json#/status"
+            "$ref": "mixins.json#/schema_version"
         },
         {
             "$ref": "mixins.json#/static_embeds"
         },
         {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
             "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
         },
         {
             "$ref": "quality_metric.json#/properties"
@@ -62,7 +62,6 @@
             "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "enable_nested": true,
                 "required": [
                     "key",
                     "value"
