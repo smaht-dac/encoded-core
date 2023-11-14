@@ -7,6 +7,12 @@ Change Log
 ----------
 
 
+0.3.0
+=====
+
+* SMaHT ingestion related work (keep in sync with drr_schema_updates).
+
+
 0.2.0
 =====
 
