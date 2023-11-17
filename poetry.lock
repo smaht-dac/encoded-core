@@ -823,7 +823,7 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "dcicsnovault"
-version = "11.3.0.1b1"
+version = "11.4.0.1b1"
 description = "Storage support for 4DN Data Portals."
 optional = false
 python-versions = "*"
@@ -836,7 +836,7 @@ url = "../snovault"
 
 [[package]]
 name = "dcicutils"
-version = "8.2.0.1b1"
+version = "8.3.0.1b1"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 optional = false
 python-versions = "*"
@@ -2431,4 +2431,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.12"
-content-hash = "11e554adce09b809dff984e79bcb91416e514cf61d8f4ccffe208dc51d9a0102"
+content-hash = "e4283c6e32b78b3b8209195947560cc58c314af3ba6316277191ad1657a56d77"
