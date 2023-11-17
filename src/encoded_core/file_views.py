@@ -1,6 +1,7 @@
 import datetime
 import pytz
 import structlog
+from typing import Any, Dict, List
 
 from pyramid.httpexceptions import (
     HTTPForbidden,
@@ -411,8 +412,8 @@ def validate_extra_file_format(context, request):
         request.errors.add('body', 'File: no extra_file format', "Can't find parent file format for extra_files")
         return
     parent_format = file_format_item['uuid']
-    schema_eformats = file_format_item.get('extrafile_formats')
-    if not schema_eformats:  # means this parent file shouldn't have any extra files
+    allowed_extra_file_formats = get_extra_file_formats(file_format_item)
+    if not allowed_extra_file_formats:  # means this parent file shouldn't have any extra files
         request.errors.add(
             'body', 'File: invalid extra files',
             "File with format %s should not have extra_files" % file_format_item.get('file_format')
@@ -420,7 +421,7 @@ def validate_extra_file_format(context, request):
         return
     else:
         valid_ext_formats = []
-        for ok_format in schema_eformats:
+        for ok_format in allowed_extra_file_formats:
             ok_format_item = get_item_or_none(request, ok_format, 'file-formats')
             try:
                 off_uuid = ok_format_item.get('uuid')
@@ -468,6 +469,13 @@ def validate_extra_file_format(context, request):
             files_ok = False
     if files_ok:
         request.validated.update({})
+
+
+def get_extra_file_formats(file_format_properties: Dict[str, Any]) -> List[str]:
+    return (
+        file_format_properties.get("extrafile_formats", [])
+        or file_format_properties.get("extra_file_formats", [])
+    )
 
 
 def build_drs_object_from_props(drs_object_base, props):
