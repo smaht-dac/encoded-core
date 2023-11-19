@@ -7,6 +7,12 @@ Change Log
 ----------
 
 
+0.2.1
+=====
+
+* Refactor File file format validator for compatibility with smaht-portal
+
+
 0.2.0
 =====
 
