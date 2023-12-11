@@ -7,8 +7,15 @@ Change Log
 ----------
 
 
+0.3.1
+=====
+
+* Allow additional properties on `extra_files` property in File schema
+
+
 0.3.0
 =====
+
 * SMaHT ingestion related work (keep in sync with drr_schema_updates).
 
 

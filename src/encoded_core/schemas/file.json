@@ -83,7 +83,7 @@
                 "FFedit-create"
             ],
             "items": {
-                "additionalProperties": false,
+                "additionalProperties": true,
                 "properties": {
                     "file_format": {
                         "linkTo": "FileFormat",
