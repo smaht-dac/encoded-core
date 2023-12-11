@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "encoded-core"
-version = "0.3.1"
+version = "0.4.0"
 description = "Core data models for Park Lab ENCODE based projects"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -40,8 +40,8 @@ python = ">=3.8.1,<3.12"
 awscli = ">=1.29.62"
 boto3 = "^1.28.62"
 botocore = "^1.31.62"
-dcicsnovault = "^11.5.0"
-dcicutils = "^8.4.0"
+dcicsnovault = "^11.6.0"
+dcicutils = "^8.5.0"
 elasticsearch = "7.13.4"
 plaster-pastedeploy = "0.6"
 psycopg2-binary = "^2.9.3"

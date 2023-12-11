@@ -896,20 +896,20 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "dcicsnovault"
-version = "11.5.0"
+version = "11.6.0"
 description = "Storage support for 4DN Data Portals."
 optional = false
 python-versions = ">=3.8.1,<3.12"
 files = [
-    {file = "dcicsnovault-11.5.0-py3-none-any.whl", hash = "sha256:4921a7fb155251922424dfa971c15111d79c421003973ab075a8de6a0378afcc"},
-    {file = "dcicsnovault-11.5.0.tar.gz", hash = "sha256:d28f937da4b14af3a6be9222449e454382b3749e7f989bcfa8d6f7c2bbf9d960"},
+    {file = "dcicsnovault-11.6.0-py3-none-any.whl", hash = "sha256:fbfa90afd735b0dedce89c491a4aace1d19709f8f29fa9aac6e4ea487a3078df"},
+    {file = "dcicsnovault-11.6.0.tar.gz", hash = "sha256:891a3d157739265505d20c3940312143b64555c9b4dcbd305556e19e3d68ce98"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
 boto3 = ">=1.28.62"
 botocore = ">=1.31.62"
-dcicutils = ">=8.4.0,<9.0.0"
+dcicutils = ">=8.5.0,<9.0.0"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
 future = ">=0.15.2,<1"
@@ -952,13 +952,13 @@ xlrd = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "dcicutils"
-version = "8.4.0"
+version = "8.5.0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 optional = false
 python-versions = ">=3.8,<3.12"
 files = [
-    {file = "dcicutils-8.4.0-py3-none-any.whl", hash = "sha256:5d7c262f2e6d738e69e12c62a5d3f5afef71532133a4f8452a8074e76794818e"},
-    {file = "dcicutils-8.4.0.tar.gz", hash = "sha256:ff7212830eb00e173e321a0e2a89d1e16641f60b917a52069fd7d2d8e172f971"},
+    {file = "dcicutils-8.5.0-py3-none-any.whl", hash = "sha256:c57a61097729b93856d2f98b0ef387ea91c908d0bf81926e70909c5a70a4c0c9"},
+    {file = "dcicutils-8.5.0.tar.gz", hash = "sha256:25e82a576e7c9f128fbb2c1581c161017059cc86b515875149005230aa8bf819"},
 ]
 
 [package.dependencies]
@@ -975,6 +975,7 @@ openpyxl = ">=3.1.2,<4.0.0"
 opensearch-py = ">=2.0.1,<3.0.0"
 PyJWT = ">=2.6.0,<3.0.0"
 pyOpenSSL = ">=23.1.1,<24.0.0"
+pyramid = "1.10.4"
 pytz = ">=2020.4"
 PyYAML = ">=6.0.1,<7.0.0"
 redis = ">=4.5.1,<5.0.0"
@@ -3481,4 +3482,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.12"
-content-hash = "51f0beb452968faee9adf5e3d2b2bdddccae02a9da90711e607d0dac5c3de80d"
+content-hash = "aaa22340b3aad78a5599347abf8216b56b27f89b2cdc8dc7fb2a90426c88f595"
