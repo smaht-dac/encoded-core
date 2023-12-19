@@ -7,6 +7,12 @@ Change Log
 ----------
 
 
+0.4.1
+=====
+
+* Limit upgrader config scan to its file only
+
+
 0.4.0
 =====
 
