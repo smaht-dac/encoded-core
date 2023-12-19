@@ -9,7 +9,7 @@ LATE = 10
 
 
 def includeme(config):
-    config.scan()
+    config.scan(__name__)  # Only scan this file, not entire project!
 
     def callback():
         """ add_upgrade for all item types
