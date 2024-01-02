@@ -7,6 +7,12 @@ Change Log
 ----------
 
 
+0.5.0
+=====
+
+* Updated dcicutils to 8.6.0 (with structured_data and SMaHT ingestion related fixes).
+
+
 0.4.0
 =====
 
