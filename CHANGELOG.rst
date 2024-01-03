@@ -7,6 +7,13 @@ Change Log
 ----------
 
 
+0.6.0
+=====
+
+* Updated dcicsnovault to 11.8.0 with added support for an
+  optional gitinfo.json file (deployed via portal buildspec.yml).
+
+
 0.5.0
 =====
 
