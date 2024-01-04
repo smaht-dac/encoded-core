@@ -5,11 +5,17 @@ from snovault import (
 )
 from snovault.upgrader import default_upgrade_finalizer
 
+
 LATE = 10
 
 
 def includeme(config):
-    config.scan()
+    """Configure upgrade actions and finalizers.
+
+    Scan only the file, not the entire project, to avoid adding other
+    features to the configuration that may conflict with parent app.
+    """
+    config.scan(__name__)
 
     def callback():
         """ add_upgrade for all item types

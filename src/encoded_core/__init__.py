@@ -11,11 +11,6 @@ from .local_roles import LocalRolesAuthorizationPolicy
 APP_VERSION_REGISTRY_KEY = 'encoded-core.app_version'
 
 
-def includeme(config):
-    """include me method."""
-    config.scan()
-
-
 def app_version(config):
     if not config.registry.settings.get(APP_VERSION_REGISTRY_KEY):
         # we update version as part of deployment process `deploy_beanstalk.py`
@@ -64,6 +59,7 @@ def main(global_config, **local_config):
         config.include('snovault.root')
 
     config.include('.upgrade')
+    config.scan()
 
     app = config.make_wsgi_app()
     return app
