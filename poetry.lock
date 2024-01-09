@@ -896,20 +896,20 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "dcicsnovault"
-version = "11.8.0.1b10"
+version = "11.8.0.1b11"
 description = "Storage support for 4DN Data Portals."
 optional = false
 python-versions = ">=3.8.1,<3.12"
 files = [
-    {file = "dcicsnovault-11.8.0.1b10-py3-none-any.whl", hash = "sha256:887d414dbe0194434a9e9da90776bcdced2ee615be61201bd4b149830be2603b"},
-    {file = "dcicsnovault-11.8.0.1b10.tar.gz", hash = "sha256:183954b958dffdecdf4f3c81ffaf693bc5aa34a40ea723bc126f369bf0ea17ee"},
+    {file = "dcicsnovault-11.8.0.1b11-py3-none-any.whl", hash = "sha256:6214fe390b43e29329e8806409b81592cb6de234dfc7f963a930792015680f0f"},
+    {file = "dcicsnovault-11.8.0.1b11.tar.gz", hash = "sha256:5896b927caef8a219250331a914e48ce80de729a0e82643c8368552d1ad09a50"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
 boto3 = ">=1.28.62"
 botocore = ">=1.31.62"
-dcicutils = ">=8.7.0.1b20,<9.0.0.0"
+dcicutils = ">=8.7.0.1b21,<9.0.0.0"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
 future = ">=0.15.2,<1"
@@ -952,13 +952,13 @@ xlrd = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "dcicutils"
-version = "8.7.0.1b20"
+version = "8.7.0.1b21"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 optional = false
 python-versions = ">=3.8,<3.12"
 files = [
-    {file = "dcicutils-8.7.0.1b20-py3-none-any.whl", hash = "sha256:d7b211a6a7cdd1767e9432f9d7d66b648f11d0ef2274a00b43a6868d8388266d"},
-    {file = "dcicutils-8.7.0.1b20.tar.gz", hash = "sha256:ad7c1676c9df2827a0560b9576b17008135430b89dce8f631e1ce15135f8ff7c"},
+    {file = "dcicutils-8.7.0.1b21-py3-none-any.whl", hash = "sha256:fa4ca54ea96e457b9a8c00b82d9d0d8d279a4b9dfe786e322f976edc26a4305c"},
+    {file = "dcicutils-8.7.0.1b21.tar.gz", hash = "sha256:541e6aa9a2c06a368de9541760238976e1f02b4028d802df13110974011934f5"},
 ]
 
 [package.dependencies]
@@ -3482,4 +3482,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.12"
-content-hash = "3b4140c304f6a553b36788b9303a6a1f3560949849c86480f0e8b5ffeb936e2d"
+content-hash = "152e2006a5cfb924b2d72a84f3cb64839535a2147ed5c9dc637448927fc2e0e8"
