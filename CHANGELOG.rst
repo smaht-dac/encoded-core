@@ -10,6 +10,13 @@ Change Log
 0.6.0
 =====
 
+* Version updates to dcicutils, dcicsnovault.
+  Changes to itemize SMaHT submission ingestion create/update/diff situation.
+
+
+0.6.0
+=====
+
 * Updated dcicsnovault to 11.8.0 with added support for an
   optional gitinfo.json file (deployed via portal buildspec.yml).
 
