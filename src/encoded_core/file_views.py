@@ -334,7 +334,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
 
     file_extension =  os.path.splitext(filename)[1][1:]
     item_types = [ty for ty in reversed(context.jsonld_type()[:-1])]
-    lab_or_submission_center_title = lab_or_submission_center.get("display_title") if lab_or_submission_center is not None or "None"
+    lab_or_submission_center_title = lab_or_submission_center.get("display_title") if lab_or_submission_center is not None else "None"
 
     ga_payload = {
         "client_id": ga_cid,
