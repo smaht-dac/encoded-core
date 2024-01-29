@@ -6,6 +6,11 @@ encoded-core
 Change Log
 ----------
 
+0.6.1
+=====
+
+* Fix ``extra_files.filename`` such that the field contains the file_format suffix, to differentiate it from the normal file
+
 
 0.6.0
 =====
