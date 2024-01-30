@@ -109,6 +109,9 @@ def test_validate_extra_files_extra_files_good_post(testapp, processed_file_data
     extf = {'file_format': 'bai'}
     processed_file_data['extra_files'] = [extf]
     res = testapp.post_json('/files-processed', processed_file_data, status=201)
+    accession = res.json['@graph'][0]['accession']
+    extra_file_name = res.json['@graph'][0]['extra_files'][0]['filename']
+    assert extra_file_name == f'{accession}.bam.bai'
     assert not res.json.get('errors')
 
 
