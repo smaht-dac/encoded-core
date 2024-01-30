@@ -306,7 +306,7 @@ class File(Item):
                 #    xfile['status'] = properties.get('status')
                 ext = self.build_external_creds(self.registry, uuid, xfile)
                 # build href
-                filename = xfile['filename']
+                filename = '{}.{}'.format(xfile['accession'], file_extension)
                 xfile['href'] = at_id + '@@download/' + filename
                 xfile['upload_key'] = ext['key']
                 sheets['external' + xfile['file_format']] = ext
