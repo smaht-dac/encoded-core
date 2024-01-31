@@ -181,11 +181,6 @@ def download(context, request):
     # search to find the "right" file and redirect to a download link for that one
     properties = context.upgrade_properties()
     file_format = get_item_or_none(request, properties.get('file_format'), 'file-formats')
-    lab_or_submission_center = None
-    if properties.get('lab') is not None:
-        lab_or_submission_center = get_item_or_none(request, properties.get('lab'), 'labs')
-    elif properties.get('submission_centers') is not None and len(properties.get('submission_centers')) > 0:
-        lab_or_submission_center = get_item_or_none(request, properties.get('submission_centers')[0], 'submission-centers')
     _filename = None
     if request.subpath:
         _filename, = request.subpath
@@ -270,13 +265,14 @@ def download(context, request):
 
     # Analytics Stuff
     ga_config = request.registry.settings.get('ga_config')
-    # TODO: replace below line with 4DN/SMaHT compatible type 
-    file_experiment_type = None #get_file_experiment_type(request, context, properties)
-    file_at_id = context.jsonld_id(request)
-
+    
     if ga_config:
-        update_google_analytics(context, request, ga_config, filename, file_size_downloaded, file_at_id, lab_or_submission_center,
-                                user_uuid, user_groups, file_experiment_type, properties.get('file_type'))
+        submitter_title = get_submitter_title(request, context, properties)
+        exp_or_assay_type = get_experiment_or_assay_type(request, context, properties)
+        file_type = get_file_type(request, context, properties)
+        file_at_id = context.jsonld_id(request)
+        update_google_analytics(context, request, ga_config, filename, file_size_downloaded, file_at_id, submitter_title,
+                                user_uuid, user_groups, exp_or_assay_type, file_type)
 
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
@@ -309,9 +305,42 @@ def download(context, request):
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)
 
+def get_submitter_title(request, context, properties):
+    submitter = None
+    if properties.get('lab') is not None:
+        submitter = get_item_or_none(request, properties.get('lab'), 'labs')
+    elif properties.get('submission_centers') is not None and len(properties.get('submission_centers')) > 0:
+        submitter = get_item_or_none(request, properties.get('submission_centers')[0], 'submission-centers')
+
+    return submitter and submitter.get('display_title')
+
+
+def get_experiment_or_assay_type(request, context, properties):
+    # SMaHT
+    if properties.get('file_sets') is not None: 
+        if len(properties.get('file_sets')) > 0:
+            file_set = get_item_or_none(request, properties.get('file_sets')[0], 'file-sets', frame='embedded')
+            if file_set is not None and file_set.get('assay'):
+                return file_set['assay'].get('display_title')
+    # 4DN
+    elif properties.get('track_and_facet_info') is None:
+        file_item = get_item_or_none(request, context.uuid)
+        if file_item is not None and file_item.get('track_and_facet_info') and file_item['track_and_facet_info'].get('experiment_type'):
+            return file_item['track_and_facet_info']['experiment_type']
+    # fallback
+    return None
+
+def get_file_type(request, context, properties):
+    # SMaHT
+    if properties.get('data_category') is not None: 
+        if len(properties.get('data_category')) > 0:
+            return properties.get('data_category')[0]
+    # 4DN/fallback
+    return properties.get('file_type') or 'other'
+
 
 def update_google_analytics(context, request, ga_config, filename, file_size_downloaded,
-                            file_at_id, lab_or_submission_center, user_uuid, user_groups, file_experiment_type, file_type='other'):
+                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type, file_type='other'):
     """ Helper for @@download that updates GA in response to a download.
     """
     registry = request.registry
@@ -334,7 +363,6 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
 
     file_extension =  os.path.splitext(filename)[1][1:]
     item_types = [ty for ty in reversed(context.jsonld_type()[:-1])]
-    lab_or_submission_center_title = lab_or_submission_center.get("display_title") if lab_or_submission_center is not None else "None"
 
     ga_payload = {
         "client_id": ga_cid,
@@ -353,8 +381,8 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
                     "link_url": request.url,
                     "file_size": file_size_downloaded,
                     "downloads": 0 if request.range else 1,
-                    "experiment_type": file_experiment_type or "None",
-                    "lab": lab_or_submission_center_title,
+                    "experiment_type": exp_or_assay_type or "None",
+                    "lab": submitter_title or "None",
                     # Product Category from @type, e.g. "File/FileProcessed"
                     "file_classification": "/".join(item_types),
                     "file_type": file_type,
@@ -364,7 +392,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
                             "item_name": filename,
                             "item_category": item_types[0] if len(item_types) >= 1 else "Unknown",
                             "item_category2": item_types[1] if len(item_types) >= 2 else "Unknown",
-                            "item_brand": lab_or_submission_center_title,
+                            "item_brand": submitter_title or "None",
                             "item_variant": file_type,
                             "quantity": 1
                         }
