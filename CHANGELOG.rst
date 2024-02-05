@@ -7,7 +7,7 @@ Change Log
 ----------
 
 
-0.6.0
+0.7.0
 =====
 
 * Version updates to dcicutils, dcicsnovault.
