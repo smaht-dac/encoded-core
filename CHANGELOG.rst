@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.8.0
+=====
+
+* Fix ``extra_files.filename`` such that the field contains the file_format suffix, to differentiate it from the normal file
+* Changes for GA4
+
 
 0.7.0
 =====

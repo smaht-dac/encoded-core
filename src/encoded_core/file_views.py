@@ -1,5 +1,8 @@
 import datetime
+import json
+import os
 import pytz
+import requests
 import structlog
 from typing import Any, Dict, List
 
@@ -156,6 +159,12 @@ def download(context, request):
         user_props = session_properties(context, request)
     except Exception as e:
         user_props = {'error': str(e)}
+
+    user_uuid = user_props.get('details', {}).get('uuid', None)
+    user_groups = user_props.get('details', {}).get('groups', None)
+    if user_groups:
+        user_groups.sort()
+
     tracking_values = {'user_agent': request.user_agent, 'remote_ip': request.remote_addr,
                        'user_uuid': user_props.get('details', {}).get('uuid', 'anonymous'),
                        'request_path': request.path_info, 'request_headers': str(dict(request.headers))}
@@ -195,6 +204,23 @@ def download(context, request):
         if file_format is not None:
             tracking_values['file_format'] = file_format.get('file_format')
     tracking_values['filename'] = filename
+
+    # Calculate bytes downloaded from Range header
+    file_size_downloaded = properties.get('file_size', 0)
+    if request.range:
+        file_size_downloaded = 0
+        # Assume range unit is bytes
+        if hasattr(request.range, "ranges"):
+            for (range_start, range_end) in request.range.ranges:
+                file_size_downloaded += (
+                    (range_end or properties.get('file_size', 0)) -
+                    (range_start or 0)
+                )
+        else:
+            file_size_downloaded = (
+                (request.range.end or properties.get('file_size', 0)) -
+                (request.range.start or 0)
+            )
 
     if not external:
         external = context.build_external_creds(request.registry, context.uuid, properties)
@@ -237,6 +263,17 @@ def download(context, request):
     # except Exception as e:
     #     log.error('Cannot create TrackingItem on download of %s' % context.uuid, error=str(e))
 
+    # Analytics Stuff
+    ga_config = request.registry.settings.get('ga_config')
+    
+    if ga_config:
+        submitter_title = get_submitter_title(request, context, properties)
+        exp_or_assay_type = get_experiment_or_assay_type(request, context, properties)
+        file_type = get_file_type(request, context, properties)
+        file_at_id = context.jsonld_id(request)
+        update_google_analytics(context, request, ga_config, filename, file_size_downloaded, file_at_id, submitter_title,
+                                user_uuid, user_groups, exp_or_assay_type, file_type)
+
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
         return {
@@ -267,6 +304,128 @@ def download(context, request):
 
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)
+
+def get_submitter_title(request, context, properties):
+    submitter = None
+    if properties.get('lab') is not None:
+        submitter = get_item_or_none(request, properties.get('lab'), 'labs')
+    elif properties.get('submission_centers') is not None and len(properties.get('submission_centers')) > 0:
+        submitter = get_item_or_none(request, properties.get('submission_centers')[0], 'submission-centers')
+
+    return submitter and submitter.get('display_title')
+
+
+def get_experiment_or_assay_type(request, context, properties):
+    # SMaHT
+    if properties.get('file_sets') is not None: 
+        if len(properties.get('file_sets')) > 0:
+            file_set = get_item_or_none(request, properties.get('file_sets')[0], 'file-sets', frame='embedded')
+            if file_set is not None and file_set.get('assay'):
+                return file_set['assay'].get('display_title')
+    # 4DN
+    elif properties.get('track_and_facet_info') is None:
+        file_item = get_item_or_none(request, context.uuid)
+        if file_item is not None and file_item.get('track_and_facet_info') and file_item['track_and_facet_info'].get('experiment_type'):
+            return file_item['track_and_facet_info']['experiment_type']
+    # fallback
+    return None
+
+def get_file_type(request, context, properties):
+    # SMaHT
+    if properties.get('data_category') is not None: 
+        if len(properties.get('data_category')) > 0:
+            return properties.get('data_category')[0]
+    # 4DN/fallback
+    return properties.get('file_type') or 'other'
+
+
+def update_google_analytics(context, request, ga_config, filename, file_size_downloaded,
+                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type, file_type='other'):
+    """ Helper for @@download that updates GA in response to a download.
+    """
+    registry = request.registry
+    ga4_secret = registry.settings.get('ga4.secret')
+    if not ga4_secret:
+        raise Exception("No valid GA4 api secret found")
+
+    ga_cid = request.cookies.get("clientIdentifier")
+    if not ga_cid:  # Fallback, potentially can stop working as GA is updated
+        ga_cid = request.cookies.get("_ga")
+        if ga_cid:
+            ga_cid = ".".join(ga_cid.split(".")[2:])
+
+    ga_tid_mapping = ga_config["hostnameTrackerIDMapping"].get(request.host,
+                                                       ga_config["hostnameTrackerIDMapping"].get("default"))
+    ga_tid = ga_tid_mapping[1] if isinstance(ga_tid_mapping, list) and len(ga_tid_mapping) > 1 else None
+
+    if ga_tid is None:
+        raise Exception("No valid tracker id found in ga_config.json > hostnameTrackerIDMapping")
+
+    file_extension =  os.path.splitext(filename)[1][1:]
+    item_types = [ty for ty in reversed(context.jsonld_type()[:-1])]
+
+    ga_payload = {
+        "client_id": ga_cid,
+        "timestamp_micros": str(int(datetime.datetime.now().timestamp() * 1000000)),
+        "non_personalized_ads": False,
+        "events": [
+            {
+                "name": "purchase",
+                "params": {
+                    #"debug_mode": 1,
+                    "name": filename,
+                    "source": "Serverside File Download",
+                    "action": "Range Query" if request.range else "File Download",
+                    "file_name": filename,
+                    "file_extension": file_extension,
+                    "link_url": request.url,
+                    "file_size": file_size_downloaded,
+                    "downloads": 0 if request.range else 1,
+                    "experiment_type": exp_or_assay_type or "None",
+                    "lab": submitter_title or "None",
+                    # Product Category from @type, e.g. "File/FileProcessed"
+                    "file_classification": "/".join(item_types),
+                    "file_type": file_type,
+                    "items": [
+                        {
+                            "item_id": file_at_id,
+                            "item_name": filename,
+                            "item_category": item_types[0] if len(item_types) >= 1 else "Unknown",
+                            "item_category2": item_types[1] if len(item_types) >= 2 else "Unknown",
+                            "item_brand": submitter_title or "None",
+                            "item_variant": file_type,
+                            "quantity": 1
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    if user_uuid:
+        ga_payload['events'][0]['params']['user_uuid'] = user_uuid
+        ga_payload['user_id'] = user_uuid
+
+    if user_groups:
+        groups_json = json.dumps(user_groups, separators=(',', ':'))  # Compcact JSON; aligns w. what's passed from JS.
+        ga_payload['events'][0]['params']['user_groups'] = groups_json
+
+    # Catch error here
+    try:
+        def remove_none_fields(obj):
+            if isinstance(obj, dict):
+                return {k: remove_none_fields(v) for k, v in obj.items() if v is not None}
+            elif isinstance(obj, (list, tuple)):
+                return [remove_none_fields(item) for item in obj if item is not None]
+            else:
+                return obj
+
+        _ = requests.post(
+            url="https://www.google-analytics.com/mp/collect?measurement_id={m_tid}&api_secret={api_secret}".format(m_tid=ga_tid, api_secret=ga4_secret),
+            data=json.dumps(remove_none_fields(ga_payload)),
+            verify=True)
+    except Exception as e:
+        log.error('Exception encountered posting to GA: %s' % e)
 
 
 def validate_file_format_validity_for_file_type(context, request):

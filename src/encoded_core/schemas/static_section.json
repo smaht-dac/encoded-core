@@ -119,6 +119,19 @@
                     "title": "Preview Image",
                     "description": "Image or screenshot URL for this Item to use as a preview.",
                     "type": "string"
+                },
+                "convert_ext_links": {
+                    "title": "Convert External Links",
+                    "description": "For true, force external links to be opened in a new tab. Otherwise, leave it as is.",
+                    "type": "boolean",
+                    "default": true
+                },
+                "initial_header_level": {
+                    "title": "Initial Header Level",
+                    "description": "The initial level for section header elements (H1 to H6, and only valid for RST content)",
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 6
                 }
             }
         }
