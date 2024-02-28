@@ -309,8 +309,10 @@ def get_submitter_title(request, context, properties):
     submitter = None
     if properties.get('lab') is not None:
         submitter = get_item_or_none(request, properties.get('lab'), 'labs')
-    elif properties.get('submission_centers') is not None and len(properties.get('submission_centers')) > 0:
-        submitter = get_item_or_none(request, properties.get('submission_centers')[0], 'submission-centers')
+    elif properties.get('sequencing_center') is not None:
+        submitter = get_item_or_none(request, properties.get('sequencing_center'), 'submission-centers')
+    # elif properties.get('submission_centers') is not None and len(properties.get('submission_centers')) > 0:
+    #     submitter = get_item_or_none(request, properties.get('submission_centers')[0], 'submission-centers')
 
     return submitter and submitter.get('display_title')
 
