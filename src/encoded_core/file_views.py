@@ -394,6 +394,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
                             "item_name": filename,
                             "item_category": item_types[0] if len(item_types) >= 1 else "Unknown",
                             "item_category2": item_types[1] if len(item_types) >= 2 else "Unknown",
+                            "item_category3": item_types[2] if len(item_types) >= 3 else "Unknown",
                             "item_brand": submitter_title or "None",
                             "item_variant": file_type,
                             "quantity": 1

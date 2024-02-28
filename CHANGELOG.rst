@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.8.2
+=====
+
+* Adds item category 3 for GA4 server-side downloading event
+
+
 0.8.1
 =====
 
