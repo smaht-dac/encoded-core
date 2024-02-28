@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.8.1
+=====
+
+* Replace submission center with sequencing center in GA4 server-side downloading event
+
+
 0.8.0
 =====
 
