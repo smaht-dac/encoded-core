@@ -6,6 +6,15 @@ encoded-core
 Change Log
 ----------
 
+
+0.8.3
+=====
+
+* 2024-03-22/dmichaels
+* Added s3:GetObject to types.file.external_creds to allow doing HEAD on
+  S3 object being uploaded  by smaht-submitr, for feedback/progress mechanism.
+
+
 0.8.2
 =====
 
