@@ -92,7 +92,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
                         "s3:GetObject"
                     ],
                     "Resource": [
-                        "*"
+                        f"arn:aws:s3:::{bucket}/{key}"
                     ],
                     "Effect": "Allow"
                 }
