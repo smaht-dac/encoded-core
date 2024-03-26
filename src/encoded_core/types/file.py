@@ -84,13 +84,18 @@ def external_creds(bucket, key, name=None, profile_name=None):
     s3_encrypt_key_id = None  # might be reassigned later from identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
     if name is not None:
         policy = {
-            'Version': '2012-10-17',
-            'Statement': [
+            "Version": "2012-10-17",
+            "Statement": [
                 {
-                    'Effect': 'Allow',
-                    'Action': 's3:PutObject',
-                    'Resource': f'arn:aws:s3:::{bucket}/{key}',
-                },
+                    "Action": [
+                        "s3:PutObject",
+                        "s3:GetObject"
+                    ],
+                    "Resource": [
+                        f"arn:aws:s3:::{bucket}/{key}"
+                    ],
+                    "Effect": "Allow"
+                }
             ]
         }
         # In the new environment, extract S3 Keys from global application configuration
