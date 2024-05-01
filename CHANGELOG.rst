@@ -15,6 +15,8 @@ Change Log
   to allow s3:HeadObject for the bucket/key, and to allow s3:ListBucket for the bucket itself.
   This supports rclone hashsum md5 for smaht-submitr; specifically to check if a file which is
   already in AWS S3 is the same (according to the md5) as a corresponding file in Google Cloud Storage.
+  Yes it does seem odd having to enable s3:ListBucket to get the checksum of a specific object;
+  but this was what was empirically determined what was needed by rclone. 
 
 
 0.8.3
