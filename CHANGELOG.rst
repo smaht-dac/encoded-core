@@ -13,7 +13,8 @@ Change Log
 * 2024-05-01/dmichaels
 * Updated the temporary AWS session token policy, for AWS file uploads, in types.external_creds
   to allow s3:HeadObject for the bucket/key, and to allow s3:ListBucket for the bucket itself.
-  This was to support rclone hashsum md5 for smaht-submitr.
+  This supports rclone hashsum md5 for smaht-submitr; specifically to check if a file which is
+  already in AWS S3 is the same (according to the md5) as a corresponding file in Google Cloud Storage.
 
 
 0.8.3
