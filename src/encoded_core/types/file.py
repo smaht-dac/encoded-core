@@ -89,10 +89,20 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 {
                     "Action": [
                         "s3:PutObject",
-                        "s3:GetObject"
+                        "s3:GetObject",
+                        "s3:HeadObject"
                     ],
                     "Resource": [
                         f"arn:aws:s3:::{bucket}/{key}"
+                    ],
+                    "Effect": "Allow"
+                },
+                {
+                    "Action": [
+                        "s3:ListBucket"
+                    ],
+                    "Resource": [
+                        f"arn:aws:s3:::{bucket}"
                     ],
                     "Effect": "Allow"
                 }
