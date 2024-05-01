@@ -12,8 +12,8 @@ Change Log
 
 * 2024-05-01/dmichaels
 * Updated the temporary AWS session token policy, for AWS file uploads, in types.external_creds
-  to allow s3:HeadObject for the bucket/key, and to allow s3:ListBucket and s3:ListBucketVersions
-  for the bucket itself. This was to support rclone hashsum md5 for smaht-submitr.
+  to allow s3:HeadObject for the bucket/key, and to allow s3:ListBucket for the bucket itself.
+  This was to support rclone hashsum md5 for smaht-submitr.
 
 
 0.8.3
