@@ -265,7 +265,7 @@ def download(context, request):
 
     # Analytics Stuff
     ga_config = request.registry.settings.get('ga_config')
-    
+
     if ga_config:
         submitter_title = get_submitter_title(request, context, properties)
         exp_or_assay_type = get_experiment_or_assay_type(request, context, properties)
@@ -305,6 +305,7 @@ def download(context, request):
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)
 
+
 def get_submitter_title(request, context, properties):
     submitter = None
     if properties.get('lab') is not None:
@@ -319,7 +320,7 @@ def get_submitter_title(request, context, properties):
 
 def get_experiment_or_assay_type(request, context, properties):
     # SMaHT
-    if properties.get('file_sets') is not None: 
+    if properties.get('file_sets') is not None:
         if len(properties.get('file_sets')) > 0:
             file_set = get_item_or_none(request, properties.get('file_sets')[0], 'file-sets', frame='embedded')
             if file_set is not None and file_set.get('assay'):
@@ -332,9 +333,10 @@ def get_experiment_or_assay_type(request, context, properties):
     # fallback
     return None
 
+
 def get_file_type(request, context, properties):
     # SMaHT
-    if properties.get('data_category') is not None: 
+    if properties.get('data_category') is not None:
         if len(properties.get('data_category')) > 0:
             return properties.get('data_category')[0]
     # 4DN/fallback

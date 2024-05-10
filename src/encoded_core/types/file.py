@@ -72,7 +72,7 @@ def show_upload_credentials(request=None, context=None, status=None):
     return request.has_permission('edit', context)
 
 
-def external_creds(bucket, key, name=None, profile_name=None):
+def external_creds(bucket, key, name=None, profile_name=None, upload=True):
     """
     if name is None, we want the link to s3 but no need to generate
     an access token.  This is useful for linking metadata to files that
@@ -81,23 +81,41 @@ def external_creds(bucket, key, name=None, profile_name=None):
 
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
+    upload_or_download = 'upload'  # this is the default
     s3_encrypt_key_id = None  # might be reassigned later from identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
     if name is not None:
-        policy = {
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Action": [
-                        "s3:PutObject",
-                        "s3:GetObject"
-                    ],
-                    "Resource": [
-                        f"arn:aws:s3:::{bucket}/{key}"
-                    ],
-                    "Effect": "Allow"
-                }
-            ]
-        }
+        if upload:
+            policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Action": [
+                            "s3:PutObject",
+                            "s3:GetObject"
+                        ],
+                        "Resource": [
+                            f"arn:aws:s3:::{bucket}/{key}"
+                        ],
+                        "Effect": "Allow"
+                    }
+                ]
+            }
+        else:  # if not upload only allow download
+            policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Action": [
+                            "s3:GetObject"
+                        ],
+                        "Resource": [
+                            f"arn:aws:s3:::{bucket}/{key}"
+                        ],
+                        "Effect": "Allow"
+                    }
+                ]
+            }
+            upload_or_download = 'download'
         # In the new environment, extract S3 Keys from global application configuration
         if 'IDENTITY' in os.environ:
             identity = assume_identity()
@@ -130,7 +148,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
         # Uncaught serialization error picked up by Docker - Will 2/25/2021
         credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
-            'upload_url': f's3://{bucket}/{key}',
+            f'{upload_or_download}_url': f's3://{bucket}/{key}',
             'federated_user_arn': token.get('FederatedUser').get('Arn'),
             'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
             's3_encrypt_key_id': s3_encrypt_key_id,
@@ -141,7 +159,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
         'service': 's3',
         'bucket': bucket,
         'key': key,
-        'upload_credentials': credentials,
+        f'{upload_or_download}_credentials': credentials,
     }
 
 
