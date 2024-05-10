@@ -81,41 +81,25 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
 
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
-    upload_or_download = 'upload'  # this is the default
+    upload_or_download = 'upload' if upload else 'download'  # upload is the default
     s3_encrypt_key_id = None  # might be reassigned later from identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
     if name is not None:
-        if upload:
-            policy = {
-                "Version": "2012-10-17",
-                "Statement": [
-                    {
-                        "Action": [
-                            "s3:PutObject",
-                            "s3:GetObject"
-                        ],
-                        "Resource": [
-                            f"arn:aws:s3:::{bucket}/{key}"
-                        ],
-                        "Effect": "Allow"
-                    }
-                ]
-            }
-        else:  # if not upload only allow download
-            policy = {
-                "Version": "2012-10-17",
-                "Statement": [
-                    {
-                        "Action": [
-                            "s3:GetObject"
-                        ],
-                        "Resource": [
-                            f"arn:aws:s3:::{bucket}/{key}"
-                        ],
-                        "Effect": "Allow"
-                    }
-                ]
-            }
-            upload_or_download = 'download'
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": [
+                        "s3:GetObject"
+                    ],
+                    "Resource": [
+                        f"arn:aws:s3:::{bucket}/{key}"
+                    ],
+                    "Effect": "Allow"
+                }
+            ]
+        }
+        if upload:  # by default allow this
+            policy['Statement'][0]['Action'].append('s3:PutObject')
         # In the new environment, extract S3 Keys from global application configuration
         if 'IDENTITY' in os.environ:
             identity = assume_identity()
