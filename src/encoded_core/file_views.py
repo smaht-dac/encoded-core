@@ -83,6 +83,10 @@ def download_cli(context, request):
         request.embed(uri, as_user=True)
     except HTTPTemporaryRedirect as e:
         return generate_creds(e)
+    except Exception as e:
+        msg = f'Error encountered with /embed {e}'
+        log.error(msg)
+        return Response(msg, status=400)
     return Response('Could not retrieve creds', status=400)
 
 
