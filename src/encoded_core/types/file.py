@@ -72,7 +72,7 @@ def show_upload_credentials(request=None, context=None, status=None):
     return request.has_permission('edit', context)
 
 
-def external_creds(bucket, key, name=None, profile_name=None):
+def external_creds(bucket, key, name=None, profile_name=None, upload=True):
     """
     if name is None, we want the link to s3 but no need to generate
     an access token.  This is useful for linking metadata to files that
@@ -81,6 +81,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
 
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
+    upload_or_download = 'upload' if upload else 'download'  # upload is the default
     s3_encrypt_key_id = None  # might be reassigned later from identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
     if name is not None:
         policy = {
@@ -88,7 +89,6 @@ def external_creds(bucket, key, name=None, profile_name=None):
             "Statement": [
                 {
                     "Action": [
-                        "s3:PutObject",
                         "s3:GetObject"
                     ],
                     "Resource": [
@@ -98,6 +98,8 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 }
             ]
         }
+        if upload:  # by default allow this
+            policy['Statement'][0]['Action'].append('s3:PutObject')
         # In the new environment, extract S3 Keys from global application configuration
         if 'IDENTITY' in os.environ:
             identity = assume_identity()
@@ -130,7 +132,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
         # Uncaught serialization error picked up by Docker - Will 2/25/2021
         credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
-            'upload_url': f's3://{bucket}/{key}',
+            f'{upload_or_download}_url': f's3://{bucket}/{key}',
             'federated_user_arn': token.get('FederatedUser').get('Arn'),
             'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
             's3_encrypt_key_id': s3_encrypt_key_id,
@@ -141,7 +143,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
         'service': 's3',
         'bucket': bucket,
         'key': key,
-        'upload_credentials': credentials,
+        f'{upload_or_download}_credentials': credentials,
     }
 
 

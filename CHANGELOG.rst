@@ -6,6 +6,11 @@ encoded-core
 Change Log
 ----------
 
+0.9.0
+=====
+
+* Update types.file.external_creds to allow generation of federation token for file downloads as well as uploads, for use with smaht-portal
+
 
 0.8.3
 =====

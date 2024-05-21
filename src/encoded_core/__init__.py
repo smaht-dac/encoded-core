@@ -1,8 +1,9 @@
 import os
+import netaddr
 from pyramid.config import Configurator
 from pyramid.settings import asbool
 
-from snovault.app import session, configure_dbsession
+from snovault.app import session, configure_dbsession, json_from_path
 from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from .local_roles import LocalRolesAuthorizationPolicy
@@ -17,6 +18,12 @@ def app_version(config):
         # but if we didn't check env then git
         version = os.environ.get("ENCODED_VERSION", "test")
         config.registry.settings[APP_VERSION_REGISTRY_KEY] = version
+
+
+def setup_aws_ip_ranges(config, settings):
+    aws_ip_ranges = json_from_path(settings.get('aws_ip_ranges_path'), {'prefixes': []})
+    config.registry['aws_ipset'] = netaddr.IPSet(
+        record['ip_prefix'] for record in aws_ip_ranges['prefixes'] if record['service'] == 'AMAZON')
 
 
 def main(global_config, **local_config):
@@ -60,6 +67,7 @@ def main(global_config, **local_config):
 
     config.include('.upgrade')
     config.scan()
+    setup_aws_ip_ranges(config, settings)
 
     app = config.make_wsgi_app()
     return app
