@@ -10,13 +10,15 @@ def file_formats(testapp):
                 "valid_item_types": ["FileProcessed"]},
         'beddb': {"standard_file_extension": "beddb",
                   "valid_item_types": ["FileProcessed", "FileReference"]},
+        'vcf_gz': {"standard_file_extension": "vcf.gz",
+                   "valid_item_types": ["FileProcessed", "FileSubmitted"]}
     }
     format_info = {
         'fastq': {'standard_file_extension': 'fastq.gz',
                   'other_allowed_extensions': ['fq.gz'],
                   "valid_item_types": ["FileSubmitted"]},
         'bam': {'standard_file_extension': 'bam',
-                'extrafile_formats': ['bai'],
+                'extrafile_formats': ['bai', 'vcf_gz'],
                 "valid_item_types": ["FileProcessed"]},
         'zip': {'standard_file_extension': 'zip',
                 "valid_item_types": ["FileProcessed"]},
@@ -33,8 +35,6 @@ def file_formats(testapp):
         'bed': {"standard_file_extension": "bed.gz",
                 "extrafile_formats": ['beddb'],
                 "valid_item_types": ["FileProcessed", "FileReference"]},
-        'vcf_gz': {"standard_file_extension": "vcf.gz",
-                   "valid_item_types": ["FileProcessed", "FileSubmitted"]}
     }
 
     for eff, info in ef_format_info.items():

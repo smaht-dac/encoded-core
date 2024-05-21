@@ -5,7 +5,7 @@ import pytz
 import requests
 import structlog
 from typing import Any, Dict, List
-
+from dcicutils.misc_utils import ignored
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPTemporaryRedirect,
@@ -50,6 +50,40 @@ log = structlog.getLogger(__name__)
 
 def includeme(config):
     config.scan(__name__)
+
+
+def extract_bucket_and_key(url: str) -> (str, str):
+    """ Takes an HTTPS URL to S3 and extracts the bucket and key """
+    parsed_url = urlparse(url)
+    bucket = parsed_url.netloc.split('.')[0]
+    key = parsed_url.path.strip('/')
+    if '?' in key:  # remove query params
+        key = key.split('?', 1)[0]
+    return bucket, key
+
+
+def generate_creds(e: HTTPTemporaryRedirect) -> dict:
+    """ Processes HTTPTemporary redirect response from the app, grabbing the bucket/key
+        and calling external_creds with upload=False
+    """
+    url = e.location
+    bucket, key = extract_bucket_and_key(url)
+    return external_creds(bucket, key, name=f'DownloadCredentials', upload=False)
+
+
+@view_config(name='download_cli', context=File, permission='view', request_method=['GET'])
+@debug_log
+def download_cli(context, request):
+    """ Runs the external_creds function with upload=False assuming user passes auth check """
+    ignored(context)
+    path = request.path
+    # Direct to @@download to track via GA and run perm check
+    try:  # this call will raise HTTPTemporary redirect if successful
+        uri = path.replace('@@download_cli', '@@download')
+        request.embed(uri, as_user=True)
+    except HTTPTemporaryRedirect as e:
+        return generate_creds(e)
+    return Response('Could not retrieve creds', status=400)
 
 
 @view_config(name='upload', context=File, request_method='GET',
