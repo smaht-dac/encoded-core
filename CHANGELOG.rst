@@ -6,6 +6,13 @@ encoded-core
 Change Log
 ----------
 
+0.9.1
+=====
+
+* set default GA4 client_id for non browser requests
+* get assay type from data_generation_summary for GA4
+
+
 0.9.0
 =====
 
