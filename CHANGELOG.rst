@@ -6,11 +6,17 @@ encoded-core
 Change Log
 ----------
 
+0.9.2
+=====
+
+* adds ``dataset`` dimension to GA4 server-side download metrics
+
+
 0.9.1
 =====
 
-* set default GA4 client_id for non browser requests
-* get assay type from data_generation_summary for GA4
+* set default GA4 ``client_id`` for non browser requests
+* get assay type from ``data_generation_summary`` for GA4
 
 
 0.9.0

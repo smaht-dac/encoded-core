@@ -309,8 +309,9 @@ def download(context, request):
         exp_or_assay_type = get_experiment_or_assay_type(request, context, properties)
         file_type = get_file_type(request, context, properties)
         file_at_id = context.jsonld_id(request)
+        dataset = properties.get('dataset')
         update_google_analytics(context, request, ga_config, filename, file_size_downloaded, file_at_id, submitter_title,
-                                user_uuid, user_groups, exp_or_assay_type, file_type)
+                                user_uuid, user_groups, exp_or_assay_type, dataset, file_type)
 
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
@@ -381,7 +382,7 @@ def get_file_type(request, context, properties):
 
 
 def update_google_analytics(context, request, ga_config, filename, file_size_downloaded,
-                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type, file_type='other'):
+                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type, dataset, file_type='other'):
     """ Helper for @@download that updates GA in response to a download.
     """
     registry = request.registry
@@ -425,6 +426,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
                     "file_size": file_size_downloaded,
                     "downloads": 0 if request.range else 1,
                     "experiment_type": exp_or_assay_type or "None",
+                    "dataset": dataset or "None",
                     "lab": submitter_title or "None",
                     # Product Category from @type, e.g. "File/FileProcessed"
                     "file_classification": "/".join(item_types),
