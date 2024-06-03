@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.9.3
+=====
+
+* Remove dependency on ``awscli``
+
+
 0.9.2
 =====
 
