@@ -110,22 +110,20 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
             # to exactly our upload file destination key, and rclone is still satisfied.
             if ALLOW_FOR_RCLONE_BASED_S3_TO_S3_COPY is True:
                 policy['Statement'].append({
-                    {
-                        "Action": [
-                            "s3:ListBucket"
-                        ],
-                        "Resource": [
-                            f"arn:aws:s3:::{bucket}"
-                        ],
-                        "Condition": {
-                            "StringLike": {
-                                "s3:prefix": [
-                                    f"{key}"
-                                ]
-                            }
-                        },
-                        "Effect": "Allow"
-                    }
+                    "Action": [
+                        "s3:ListBucket"
+                    ],
+                    "Resource": [
+                        f"arn:aws:s3:::{bucket}"
+                    ],
+                    "Condition": {
+                        "StringLike": {
+                            "s3:prefix": [
+                                f"{key}"
+                            ]
+                        }
+                    },
+                    "Effect": "Allow"
                 })
         # In the new environment, extract S3 Keys from global application configuration
         if 'IDENTITY' in os.environ:

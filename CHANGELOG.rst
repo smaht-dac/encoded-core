@@ -6,7 +6,7 @@ encoded-core
 Change Log
 ----------
 
-0.9.3
+0.9.4
 =====
 
 * Added ALLOW_FOR_RCLONE_BASED_S3_TO_S3_COPY feature to types/file.py to specifically
