@@ -79,6 +79,9 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
     already exist on s3.
     """
 
+    # 2024-06-02/dmichaels; see usage comments below.
+    ALLOW_FOR_RCLONE_BASED_S3_TO_S3_COPY = True
+
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
     upload_or_download = 'upload' if upload else 'download'  # upload is the default
@@ -100,6 +103,30 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
         }
         if upload:  # by default allow this
             policy['Statement'][0]['Action'].append('s3:PutObject')
+            # 2024-06-02/dmichaels
+            # Added this specifically and ONLY for rclone based S3-to-S3 copy. For some reason
+            # rclone really wants the s3:ListBucket policy, which would be unfortunate if it
+            # was for the entire bucket, but we found it can be limited to a key prefix set
+            # to exactly our upload file destination key, and rclone is still satisfied.
+            if ALLOW_FOR_RCLONE_BASED_S3_TO_S3_COPY is True:
+                policy['Statement'].append({
+                    {
+                        "Action": [
+                            "s3:ListBucket"
+                        ],
+                        "Resource": [
+                            f"arn:aws:s3:::{bucket}"
+                        ],
+                        "Condition": {
+                            "StringLike": {
+                                "s3:prefix": [
+                                    f"{key}"
+                                ]
+                            }
+                        },
+                        "Effect": "Allow"
+                    }
+                })
         # In the new environment, extract S3 Keys from global application configuration
         if 'IDENTITY' in os.environ:
             identity = assume_identity()
