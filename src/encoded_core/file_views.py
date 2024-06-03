@@ -309,8 +309,9 @@ def download(context, request):
         exp_or_assay_type = get_experiment_or_assay_type(request, context, properties)
         file_type = get_file_type(request, context, properties)
         file_at_id = context.jsonld_id(request)
+        dataset = properties.get('dataset')
         update_google_analytics(context, request, ga_config, filename, file_size_downloaded, file_at_id, submitter_title,
-                                user_uuid, user_groups, exp_or_assay_type, file_type)
+                                user_uuid, user_groups, exp_or_assay_type, dataset, file_type)
 
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
@@ -357,17 +358,16 @@ def get_submitter_title(request, context, properties):
 
 
 def get_experiment_or_assay_type(request, context, properties):
+    file_item = get_item_or_none(request, context.uuid)
+    if file_item is None:
+        return None
     # SMaHT
-    if properties.get('file_sets') is not None:
-        if len(properties.get('file_sets')) > 0:
-            file_set = get_item_or_none(request, properties.get('file_sets')[0], 'file-sets', frame='embedded')
-            if file_set is not None and file_set.get('assay'):
-                return file_set['assay'].get('display_title')
+    if file_item.get('data_generation_summary') and file_item['data_generation_summary'].get('assays'):
+        assays = file_item['data_generation_summary']['assays']
+        return assays[0] if len(assays) > 0 else None
     # 4DN
-    elif properties.get('track_and_facet_info') is None:
-        file_item = get_item_or_none(request, context.uuid)
-        if file_item is not None and file_item.get('track_and_facet_info') and file_item['track_and_facet_info'].get('experiment_type'):
-            return file_item['track_and_facet_info']['experiment_type']
+    elif file_item.get('track_and_facet_info') and file_item['track_and_facet_info'].get('experiment_type'):
+        return file_item['track_and_facet_info']['experiment_type']
     # fallback
     return None
 
@@ -382,7 +382,7 @@ def get_file_type(request, context, properties):
 
 
 def update_google_analytics(context, request, ga_config, filename, file_size_downloaded,
-                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type, file_type='other'):
+                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type, dataset, file_type='other'):
     """ Helper for @@download that updates GA in response to a download.
     """
     registry = request.registry
@@ -395,6 +395,8 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
         ga_cid = request.cookies.get("_ga")
         if ga_cid:
             ga_cid = ".".join(ga_cid.split(".")[2:])
+        else:
+            ga_cid = "programmatic"
 
     ga_tid_mapping = ga_config["hostnameTrackerIDMapping"].get(request.host,
                                                        ga_config["hostnameTrackerIDMapping"].get("default"))
@@ -424,6 +426,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
                     "file_size": file_size_downloaded,
                     "downloads": 0 if request.range else 1,
                     "experiment_type": exp_or_assay_type or "None",
+                    "dataset": dataset or "None",
                     "lab": submitter_title or "None",
                     # Product Category from @type, e.g. "File/FileProcessed"
                     "file_classification": "/".join(item_types),

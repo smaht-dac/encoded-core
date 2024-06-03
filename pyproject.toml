@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "encoded-core"
-version = "0.9.1"
+version = "0.9.3"
 description = "Core data models for Park Lab ENCODE based projects"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
