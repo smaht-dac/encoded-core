@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.9.4
+=====
+
+* adds ``assay type`` and ``dataset`` dimension to GA4 e-commerce product item object
+
+
 0.9.3
 =====
 
