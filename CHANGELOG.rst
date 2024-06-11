@@ -6,13 +6,18 @@ encoded-core
 Change Log
 ----------
 
-0.9.4
+0.9.5
 =====
 
 * Added ALLOW_FOR_RCLONE_BASED_S3_TO_S3_COPY feature to types/file.py to specifically
   and ONLY allow rclone based S3-to-S3 copy. For some reason rclone needs s3:ListBucket;
   but we limit it to a key prefix set to exactly our upload file destination key.
   See more comments in types/file.py/external_creds.
+
+0.9.4
+=====
+
+* adds ``assay type`` and ``dataset`` dimension to GA4 e-commerce product item object
 
 
 0.9.3
