@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.9.6
+=====
+* Updates related to Python 3.12.
+
+
+
 0.9.5
 =====
 
