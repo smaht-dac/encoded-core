@@ -1008,20 +1008,20 @@ files = [
 
 [[package]]
 name = "dcicsnovault"
-version = "11.16.0.1b5"
+version = "11.16.0.1b6"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "dcicsnovault-11.16.0.1b5-py3-none-any.whl", hash = "sha256:ea3c89e9eed41d055f6b77279c39b6aae1d53ef9c3929b554708c8db56380fb3"},
-    {file = "dcicsnovault-11.16.0.1b5.tar.gz", hash = "sha256:cf24fdf19896f740cbf1cbfde88bd0393429bbdf7b30ecd4416a765e759b23ae"},
+    {file = "dcicsnovault-11.16.0.1b6-py3-none-any.whl", hash = "sha256:71a502ec455c1c74188edca87802c4accb9a66f17a06fa229930281a1e967967"},
+    {file = "dcicsnovault-11.16.0.1b6.tar.gz", hash = "sha256:a4e843323f0560a8ffb87d1e6ec2c9a292cafa2bc3584bbc7669fe2e137663c4"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
-boto3 = ">=1.34.135,<2.0.0"
-botocore = ">=1.34.135,<2.0.0"
+boto3 = ">=1.34.136,<2.0.0"
+botocore = ">=1.34.136,<2.0.0"
 dcicutils = "8.12.0.1b6"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
@@ -4108,4 +4108,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9.0,<3.13"
-content-hash = "4d2915247468a2c7bed9d541e1a729034f813078cec1620195531f4020ae9ef3"
+content-hash = "5c22183478864cee62f81511eecf8a43d96d26d658c8547be10ff1d3e8bff6c6"
