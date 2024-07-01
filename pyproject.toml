@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "encoded-core"
-version = "1.9.5.1b10"  # TODO: To become 0.9.6
+version = "1.9.5.1b11"  # TODO: To become 0.9.6
 description = "Core data models for Park Lab ENCODE based projects"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
