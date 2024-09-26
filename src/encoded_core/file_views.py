@@ -310,8 +310,9 @@ def download(context, request):
         file_type = get_file_type(request, context, properties)
         file_at_id = context.jsonld_id(request)
         dataset = properties.get('dataset')
+        sequencing_platform = get_sequencing_platform(request, context, properties)
         update_google_analytics(context, request, ga_config, filename, file_size_downloaded, file_at_id, submitter_title,
-                                user_uuid, user_groups, exp_or_assay_type, dataset, file_type)
+                                user_uuid, user_groups, exp_or_assay_type, dataset, sequencing_platform, file_type)
 
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
@@ -381,8 +382,21 @@ def get_file_type(request, context, properties):
     return properties.get('file_type') or 'other'
 
 
+def get_sequencing_platform(request, context, properties):
+    file_item = get_item_or_none(request, context.uuid)
+    if file_item is None:
+        return None
+    # SMaHT
+    if file_item.get('data_generation_summary') and file_item['data_generation_summary'].get('sequencing_platforms'):
+        sequencing_platforms = file_item['data_generation_summary']['sequencing_platforms']
+        return sequencing_platforms[0] if len(sequencing_platforms) > 0 else None
+    # 4DN/fallback
+    return None
+
+
 def update_google_analytics(context, request, ga_config, filename, file_size_downloaded,
-                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type, dataset, file_type='other'):
+                            file_at_id, submitter_title, user_uuid, user_groups, exp_or_assay_type,
+                            dataset, sequencing_platform, file_type='other'):
     """ Helper for @@download that updates GA in response to a download.
     """
     registry = request.registry
@@ -398,14 +412,13 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
         else:
             ga_cid = "programmatic"
 
-    ga_tid_mapping = ga_config["hostnameTrackerIDMapping"].get(request.host,
-                                                       ga_config["hostnameTrackerIDMapping"].get("default"))
+    ga_tid_mapping = ga_config["hostnameTrackerIDMapping"].get(request.host, ga_config["hostnameTrackerIDMapping"].get("default"))
     ga_tid = ga_tid_mapping[1] if isinstance(ga_tid_mapping, list) and len(ga_tid_mapping) > 1 else None
 
     if ga_tid is None:
         raise Exception("No valid tracker id found in ga_config.json > hostnameTrackerIDMapping")
 
-    file_extension =  os.path.splitext(filename)[1][1:]
+    file_extension = os.path.splitext(filename)[1][1:]
     item_types = [ty for ty in reversed(context.jsonld_type()[:-1])]
 
     ga_payload = {
@@ -416,7 +429,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
             {
                 "name": "purchase",
                 "params": {
-                    #"debug_mode": 1,
+                    # "debug_mode": 1,
                     "name": filename,
                     "source": "Serverside File Download",
                     "action": "Range Query" if request.range else "File Download",
@@ -427,6 +440,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
                     "downloads": 0 if request.range else 1,
                     "experiment_type": exp_or_assay_type or "None",
                     "dataset": dataset or "None",
+                    "sequencer": sequencing_platform or "None",
                     "lab": submitter_title or "None",
                     # Product Category from @type, e.g. "File/FileProcessed"
                     "file_classification": "/".join(item_types),
@@ -442,6 +456,7 @@ def update_google_analytics(context, request, ga_config, filename, file_size_dow
                             "item_category5": dataset or "None",
                             "item_brand": submitter_title or "None",
                             "item_variant": file_type,
+                            "affiliation": sequencing_platform or "None",
                             "quantity": 1
                         }
                     ]
