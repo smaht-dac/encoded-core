@@ -6,11 +6,17 @@ encoded-core
 Change Log
 ----------
 
+0.9.7
+=====
+
+* adds ``sequencing platform`` dimension to GA4 e-commerce product item object
+
+
 0.9.6
 =====
+
 * Dropped support for Python 3.8.
 * Updates related to Python 3.12.
-
 
 
 0.9.5
