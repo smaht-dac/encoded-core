@@ -6,6 +6,12 @@ encoded-core
 Change Log
 ----------
 
+0.9.7
+=====
+* 2024-10-11/dmichaels
+* Updated dcicutils version (8.16.1) for vulnerabilities.
+
+
 0.9.6
 =====
 * Dropped support for Python 3.8.
