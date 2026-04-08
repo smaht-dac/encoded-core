@@ -131,12 +131,48 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
                     "Effect": "Allow"
                 })
         # In the new environment, extract S3 Keys from global application configuration
+        # #THIS SECTION WAS THE OLD S3 CREDENTIAL GENERATION UTILIZING LONG TERM CREDENTIALS BELOW IT HAS BEEN REFACTORED - KB
+        # if 'IDENTITY' in os.environ:
+        #     identity = assume_identity()
+        #     with override_environ(**identity):
+        #         conn = boto3.client('sts',
+        #                             aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
+        #                             aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
+        #     s3_encrypt_key_id = identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
+        #     if s3_encrypt_key_id:  # must be used with ACCOUNT_NUMBER as well
+        #         policy['Statement'].append({  # NoQA - PyCharm doesn't like this append for some bogus reason
+        #             'Effect': 'Allow',
+        #             'Action': [
+        #                 'kms:Encrypt',
+        #                 'kms:Decrypt',
+        #                 'kms:ReEncrypt*',
+        #                 'kms:GenerateDataKey*',
+        #                 'kms:DescribeKey'
+        #             ],
+        #             'Resource': f'arn:aws:kms:{CGAP_ECR_REGION}:{identity["ACCOUNT_NUMBER"]}:key/{s3_encrypt_key_id}'
+        #         })
+        # # In the old account, we are always passing IAM User creds so these will just work
+        # else:
+        #     conn = boto3.client('sts',
+        #                         aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        #                         aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
+        # token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
+        # # 'access_key' 'secret_key' 'expiration' 'session_token'
+        # credentials = token.get('Credentials')
+        # # Convert Expiration datetime object to string via cast
+        # # Uncaught serialization error picked up by Docker - Will 2/25/2021
+        # credentials['Expiration'] = str(credentials['Expiration'])
+        # credentials.update({
+        #     f'{upload_or_download}_url': f's3://{bucket}/{key}',
+        #     'federated_user_arn': token.get('FederatedUser').get('Arn'),
+        #     'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
+        #     's3_encrypt_key_id': s3_encrypt_key_id,
+        #     'request_id': token.get('ResponseMetadata').get('RequestId'),
+        #     'key': key
+        # })
+        #AFTER KELLY S3 REFACTOR
         if 'IDENTITY' in os.environ:
             identity = assume_identity()
-            with override_environ(**identity):
-                conn = boto3.client('sts',
-                                    aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
-                                    aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
             s3_encrypt_key_id = identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
             if s3_encrypt_key_id:  # must be used with ACCOUNT_NUMBER as well
                 policy['Statement'].append({  # NoQA - PyCharm doesn't like this append for some bogus reason
@@ -150,12 +186,15 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
                     ],
                     'Resource': f'arn:aws:kms:{CGAP_ECR_REGION}:{identity["ACCOUNT_NUMBER"]}:key/{s3_encrypt_key_id}'
                 })
-        # In the old account, we are always passing IAM User creds so these will just work
+            role_arn = identity.get('S3_UPLOAD_ROLE_ARN')
         else:
-            conn = boto3.client('sts',
-                                aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
-                                aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
-        token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
+            role_arn = os.environ.get('S3_UPLOAD_ROLE_ARN')
+        conn = boto3.client('sts')
+        token = conn.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName=name,
+            Policy=json.dumps(policy)
+        )
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
         # Convert Expiration datetime object to string via cast
@@ -163,8 +202,8 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
         credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
             f'{upload_or_download}_url': f's3://{bucket}/{key}',
-            'federated_user_arn': token.get('FederatedUser').get('Arn'),
-            'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
+            'federated_user_arn': token.get('AssumedRoleUser').get('Arn'),
+            'federated_user_id': token.get('AssumedRoleUser').get('AssumedRoleId'),
             's3_encrypt_key_id': s3_encrypt_key_id,
             'request_id': token.get('ResponseMetadata').get('RequestId'),
             'key': key
