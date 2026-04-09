@@ -190,8 +190,6 @@ def external_creds(bucket, key, name=None, profile_name=None, upload=True):
         else:
             role_arn = os.environ.get('S3_UPLOAD_ROLE_ARN')
         conn = boto3.client('sts')
-        print(f"DEBUG role_arn: {repr(role_arn)}")
-        print(f"DEBUG policy: {repr(json.dumps(policy))}")
         token = conn.assume_role(
             RoleArn=role_arn,
             RoleSessionName=name,
