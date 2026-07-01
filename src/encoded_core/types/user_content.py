@@ -197,7 +197,11 @@ def get_remote_file_contents(uri):
     # rebinding), bypassing the check entirely. The Host header and TLS SNI
     # are still set to the original hostname so virtual-hosting and
     # certificate validation behave normally.
-    port = parsed.port or (443 if parsed.scheme == 'https' else 80)
+    try:
+        port = parsed.port or (443 if parsed.scheme == 'https' else 80)
+    except ValueError:
+        log.error("StaticSection 'file' has an invalid port, refusing to fetch", uri=uri)
+        return None
     path = parsed.path or '/'
     if parsed.query:
         path = f'{path}?{parsed.query}'
