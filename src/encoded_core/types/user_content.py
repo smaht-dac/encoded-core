@@ -166,7 +166,7 @@ def _resolve_safe_remote_ip(hostname):
     """
     try:
         addrinfos = socket.getaddrinfo(hostname, None)
-    except socket.gaierror:
+    except (socket.gaierror, UnicodeError):
         return None
     ips = []
     for _, _, _, _, sockaddr in addrinfos:
@@ -182,7 +182,11 @@ def _resolve_safe_remote_ip(hostname):
 
 
 def get_remote_file_contents(uri):
-    parsed = urlparse(uri)
+    try:
+        parsed = urlparse(uri)
+    except ValueError:
+        log.error("StaticSection 'file' is not a valid URL, refusing to fetch", uri=uri)
+        return None
     if parsed.scheme not in ('http', 'https') or not parsed.hostname:
         log.error("StaticSection 'file' is not a valid http(s) URL, refusing to fetch", uri=uri)
         return None
