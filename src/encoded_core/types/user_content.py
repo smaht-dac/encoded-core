@@ -14,7 +14,7 @@ import ipaddress
 import os
 import socket
 import structlog
-import requests
+import urllib3
 from urllib.parse import urlparse
 
 
@@ -156,23 +156,28 @@ def get_local_file_contents(filename, contentFilesLocation=None):
     return output
 
 
-def _is_safe_remote_host(hostname):
-    """ Rejects hostnames that resolve to non-public (private/loopback/link-local/etc)
-        addresses, so a StaticSection 'file' URL can't be used to make the server
-        issue requests to internal services or the cloud metadata endpoint (SSRF).
+def _resolve_safe_remote_ip(hostname):
+    """ Resolves hostname once and, if every address it resolves to is public
+        (not private/loopback/link-local/etc), returns one of those IPs -
+        so a StaticSection 'file' URL can't be used to make the server issue
+        requests to internal services or the cloud metadata endpoint (SSRF).
+        Returns None if the hostname doesn't resolve or resolves to anything
+        non-public.
     """
     try:
         addrinfos = socket.getaddrinfo(hostname, None)
     except socket.gaierror:
-        return False
+        return None
+    ips = []
     for _, _, _, _, sockaddr in addrinfos:
         ip = ipaddress.ip_address(sockaddr[0])
         if (
             ip.is_private or ip.is_loopback or ip.is_link_local
             or ip.is_reserved or ip.is_multicast or ip.is_unspecified
         ):
-            return False
-    return True
+            return None
+        ips.append(sockaddr[0])
+    return ips[0] if ips else None
 
 
 def get_remote_file_contents(uri):
@@ -180,16 +185,42 @@ def get_remote_file_contents(uri):
     if parsed.scheme not in ('http', 'https') or not parsed.hostname:
         log.error("StaticSection 'file' is not a valid http(s) URL, refusing to fetch", uri=uri)
         return None
-    if not _is_safe_remote_host(parsed.hostname):
+    ip = _resolve_safe_remote_ip(parsed.hostname)
+    if ip is None:
         log.error("StaticSection 'file' resolves to a non-public host, refusing to fetch", uri=uri)
         return None
-    # Don't follow redirects: a host that passes the checks above could still
-    # 302 to an internal/metadata address, bypassing them entirely. A flat
-    # no-redirects policy is simpler than re-validating each hop and is
-    # sufficient here.
-    resp = requests.get(uri, timeout=10, allow_redirects=False)
-    if resp.is_redirect:
+    # Connect directly to the IP address just validated above, rather than
+    # letting the HTTP client re-resolve the hostname itself: if we let it
+    # re-resolve, an attacker controlling DNS for the host could serve a
+    # public IP for the check above and then a private/link-local one (e.g.
+    # cloud metadata) for the actual connection moments later (DNS
+    # rebinding), bypassing the check entirely. The Host header and TLS SNI
+    # are still set to the original hostname so virtual-hosting and
+    # certificate validation behave normally.
+    port = parsed.port or (443 if parsed.scheme == 'https' else 80)
+    path = parsed.path or '/'
+    if parsed.query:
+        path = f'{path}?{parsed.query}'
+    if parsed.scheme == 'https':
+        pool = urllib3.HTTPSConnectionPool(
+            ip, port=port, timeout=10, retries=False,
+            assert_hostname=parsed.hostname, server_hostname=parsed.hostname,
+        )
+    else:
+        pool = urllib3.HTTPConnectionPool(ip, port=port, timeout=10, retries=False)
+    try:
+        # Don't follow redirects: a host that passes the checks above could still
+        # redirect to an internal/metadata address, bypassing them entirely. A flat
+        # no-redirects policy is simpler than re-validating each hop and is
+        # sufficient here.
+        resp = pool.urlopen('GET', path, headers={'Host': parsed.hostname}, redirect=False)
+    except urllib3.exceptions.HTTPError as e:
+        log.error("StaticSection 'file' request failed", uri=uri, error=str(e))
+        return None
+    finally:
+        pool.close()
+    if 300 <= resp.status < 400:
         log.error("StaticSection 'file' returned a redirect, refusing to follow", uri=uri,
                   location=resp.headers.get('Location'))
         return None
-    return resp.text
+    return resp.data.decode('utf-8', errors='replace')
