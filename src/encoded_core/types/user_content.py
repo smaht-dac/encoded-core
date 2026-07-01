@@ -10,8 +10,15 @@ from snovault.interfaces import STORAGE
 from snovault.types.base import (
     Item,
 )
+import ipaddress
 import os
+import socket
+import structlog
 import requests
+from urllib.parse import urlparse
+
+
+log = structlog.getLogger(__name__)
 
 
 @abstract_collection(
@@ -103,7 +110,14 @@ class StaticSection(UserContent):
             if file[0:4] == 'http' and '://' in file[4:8]:  # Remote File
                 return get_remote_file_contents(file)
             else:                                           # Local File
-                file_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../.." + file)   # Go to top of repo, append file
+                repo_root = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../..")
+                file_path = os.path.abspath(repo_root + file)   # Go to top of repo, append file
+                # Reject any 'file' value (e.g. containing '../') that would resolve
+                # outside of the repo, so this can't be used to read arbitrary files
+                # off of the server's filesystem.
+                if os.path.commonpath([repo_root, file_path]) != repo_root:
+                    log.error("StaticSection 'file' resolves outside of repo root, refusing to read", file=file)
+                    return None
                 return get_local_file_contents(file_path)
 
         return None
@@ -142,6 +156,40 @@ def get_local_file_contents(filename, contentFilesLocation=None):
     return output
 
 
+def _is_safe_remote_host(hostname):
+    """ Rejects hostnames that resolve to non-public (private/loopback/link-local/etc)
+        addresses, so a StaticSection 'file' URL can't be used to make the server
+        issue requests to internal services or the cloud metadata endpoint (SSRF).
+    """
+    try:
+        addrinfos = socket.getaddrinfo(hostname, None)
+    except socket.gaierror:
+        return False
+    for _, _, _, _, sockaddr in addrinfos:
+        ip = ipaddress.ip_address(sockaddr[0])
+        if (
+            ip.is_private or ip.is_loopback or ip.is_link_local
+            or ip.is_reserved or ip.is_multicast or ip.is_unspecified
+        ):
+            return False
+    return True
+
+
 def get_remote_file_contents(uri):
-    resp = requests.get(uri)
+    parsed = urlparse(uri)
+    if parsed.scheme not in ('http', 'https') or not parsed.hostname:
+        log.error("StaticSection 'file' is not a valid http(s) URL, refusing to fetch", uri=uri)
+        return None
+    if not _is_safe_remote_host(parsed.hostname):
+        log.error("StaticSection 'file' resolves to a non-public host, refusing to fetch", uri=uri)
+        return None
+    # Don't follow redirects: a host that passes the checks above could still
+    # 302 to an internal/metadata address, bypassing them entirely. A flat
+    # no-redirects policy is simpler than re-validating each hop and is
+    # sufficient here.
+    resp = requests.get(uri, timeout=10, allow_redirects=False)
+    if resp.is_redirect:
+        log.error("StaticSection 'file' returned a redirect, refusing to follow", uri=uri,
+                  location=resp.headers.get('Location'))
+        return None
     return resp.text

@@ -326,8 +326,12 @@ def download(context, request):
             response_body = conn.get_object(**param_get_object)
         except Exception as e:
             raise e
+        body_stream = response_body.get('Body')
         response_dict = {
-            'body': response_body.get('Body').read(),
+            # Stream the S3 body instead of reading it fully into memory first -
+            # these files can be many GB/TB, so buffering a ranged request's full
+            # body here would let a single request exhaust app server memory.
+            'app_iter': iter(lambda: body_stream.read(1024 * 1024), b''),
             # status_code : 206 if partial, 200 if the range covers whole file
             'status_code': response_body.get('ResponseMetadata').get('HTTPStatusCode'),
             'accept_ranges': response_body.get('AcceptRanges'),
