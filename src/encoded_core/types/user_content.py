@@ -174,6 +174,7 @@ def _resolve_safe_remote_ip(hostname):
         if (
             ip.is_private or ip.is_loopback or ip.is_link_local
             or ip.is_reserved or ip.is_multicast or ip.is_unspecified
+            or not ip.is_global
         ):
             return None
         ips.append(sockaddr[0])
