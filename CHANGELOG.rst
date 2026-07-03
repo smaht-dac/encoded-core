@@ -6,10 +6,8 @@ encoded-core
 Change Log
 ----------
 
-0.9.6
+0.9.7
 =====
-* Dropped support for Python 3.8.
-* Updates related to Python 3.12.
 * Fixed SSRF/local-file-read vulnerability in ``StaticSection`` file content resolution
   (``types/user_content.py``): remote fetches now validate the resolved IP is public
   (with IP pinning to prevent DNS-rebinding) and refuse to follow redirects, and local
@@ -20,6 +18,13 @@ Change Log
 * Fixed a memory-exhaustion DoS in ``File`` ``@@download`` (``file_views.py``) where
   Range requests buffered the entire S3 object body into memory; the response is now
   streamed instead.
+
+
+
+0.9.6
+=====
+* Dropped support for Python 3.8.
+* Updates related to Python 3.12.
 
 
 
