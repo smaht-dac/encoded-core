@@ -6,6 +6,14 @@ encoded-core
 Change Log
 ----------
 
+0.9.7
+=====
+* Added direct unit tests for previously under-covered pure-logic modules
+  (``local_roles``, ``page_views`` tree helpers, ``WorkflowRun.steps`` run-data
+  mapping, ``types/document`` and ``types/tracking_item`` display logic). Tests
+  only; no production behavior changes.
+
+
 0.9.6
 =====
 * Dropped support for Python 3.8.
