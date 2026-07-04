@@ -6,7 +6,7 @@ encoded-core
 Change Log
 ----------
 
-0.9.7
+0.9.8
 =====
 * Added direct unit tests for previously under-covered pure-logic modules
   (``local_roles``, ``page_views`` tree helpers, ``WorkflowRun.steps`` run-data
