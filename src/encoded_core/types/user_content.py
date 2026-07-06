@@ -10,8 +10,15 @@ from snovault.interfaces import STORAGE
 from snovault.types.base import (
     Item,
 )
+import ipaddress
 import os
-import requests
+import socket
+import structlog
+import urllib3
+from urllib.parse import urlparse
+
+
+log = structlog.getLogger(__name__)
 
 
 @abstract_collection(
@@ -103,7 +110,14 @@ class StaticSection(UserContent):
             if file[0:4] == 'http' and '://' in file[4:8]:  # Remote File
                 return get_remote_file_contents(file)
             else:                                           # Local File
-                file_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../.." + file)   # Go to top of repo, append file
+                repo_root = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../..")
+                file_path = os.path.abspath(repo_root + file)   # Go to top of repo, append file
+                # Reject any 'file' value (e.g. containing '../') that would resolve
+                # outside of the repo, so this can't be used to read arbitrary files
+                # off of the server's filesystem.
+                if os.path.commonpath([repo_root, file_path]) != repo_root:
+                    log.error("StaticSection 'file' resolves outside of repo root, refusing to read", file=file)
+                    return None
                 return get_local_file_contents(file_path)
 
         return None
@@ -142,6 +156,80 @@ def get_local_file_contents(filename, contentFilesLocation=None):
     return output
 
 
+def _resolve_safe_remote_ip(hostname):
+    """ Resolves hostname once and, if every address it resolves to is public
+        (not private/loopback/link-local/etc), returns one of those IPs -
+        so a StaticSection 'file' URL can't be used to make the server issue
+        requests to internal services or the cloud metadata endpoint (SSRF).
+        Returns None if the hostname doesn't resolve or resolves to anything
+        non-public.
+    """
+    try:
+        addrinfos = socket.getaddrinfo(hostname, None)
+    except (socket.gaierror, UnicodeError):
+        return None
+    ips = []
+    for _, _, _, _, sockaddr in addrinfos:
+        ip = ipaddress.ip_address(sockaddr[0])
+        if (
+            ip.is_private or ip.is_loopback or ip.is_link_local
+            or ip.is_reserved or ip.is_multicast or ip.is_unspecified
+            or not ip.is_global
+        ):
+            return None
+        ips.append(sockaddr[0])
+    return ips[0] if ips else None
+
+
 def get_remote_file_contents(uri):
-    resp = requests.get(uri)
-    return resp.text
+    try:
+        parsed = urlparse(uri)
+    except ValueError:
+        log.error("StaticSection 'file' is not a valid URL, refusing to fetch", uri=uri)
+        return None
+    if parsed.scheme not in ('http', 'https') or not parsed.hostname:
+        log.error("StaticSection 'file' is not a valid http(s) URL, refusing to fetch", uri=uri)
+        return None
+    ip = _resolve_safe_remote_ip(parsed.hostname)
+    if ip is None:
+        log.error("StaticSection 'file' resolves to a non-public host, refusing to fetch", uri=uri)
+        return None
+    # Connect directly to the IP address just validated above, rather than
+    # letting the HTTP client re-resolve the hostname itself: if we let it
+    # re-resolve, an attacker controlling DNS for the host could serve a
+    # public IP for the check above and then a private/link-local one (e.g.
+    # cloud metadata) for the actual connection moments later (DNS
+    # rebinding), bypassing the check entirely. The Host header and TLS SNI
+    # are still set to the original hostname so virtual-hosting and
+    # certificate validation behave normally.
+    try:
+        port = parsed.port or (443 if parsed.scheme == 'https' else 80)
+    except ValueError:
+        log.error("StaticSection 'file' has an invalid port, refusing to fetch", uri=uri)
+        return None
+    path = parsed.path or '/'
+    if parsed.query:
+        path = f'{path}?{parsed.query}'
+    if parsed.scheme == 'https':
+        pool = urllib3.HTTPSConnectionPool(
+            ip, port=port, timeout=10, retries=False,
+            assert_hostname=parsed.hostname, server_hostname=parsed.hostname,
+        )
+    else:
+        pool = urllib3.HTTPConnectionPool(ip, port=port, timeout=10, retries=False)
+    try:
+        # Don't follow redirects: a host that passes the checks above could still
+        # redirect to an internal/metadata address, bypassing them entirely. A flat
+        # no-redirects policy is simpler than re-validating each hop and is
+        # sufficient here.
+        resp = pool.urlopen('GET', path, headers={'Host': parsed.hostname}, redirect=False)
+    except urllib3.exceptions.HTTPError as e:
+        log.error("StaticSection 'file' request failed", uri=uri, error=str(e))
+        return None
+    finally:
+        pool.close()
+    if 300 <= resp.status < 400:
+        log.error("StaticSection 'file' returned a redirect, refusing to follow", uri=uri,
+                  location=resp.headers.get('Location'))
+        return None
+    return resp.data.decode('utf-8', errors='replace')
