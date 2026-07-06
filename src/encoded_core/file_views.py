@@ -186,6 +186,22 @@ def is_file_to_download(properties, file_format, expected_filename=None):
         return filename
 
 
+def _iter_and_close(stream, chunk_size=1024 * 1024):
+    """ Yields chunks of an S3 object body stream, closing it once exhausted
+        or if the caller (e.g. a client that aborts a Range download partway
+        through) stops iterating early, so the underlying connection is
+        released back to the pool promptly instead of leaking until GC.
+    """
+    try:
+        while True:
+            chunk = stream.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk
+    finally:
+        stream.close()
+
+
 @view_config(name='download', context=File, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
@@ -326,8 +342,12 @@ def download(context, request):
             response_body = conn.get_object(**param_get_object)
         except Exception as e:
             raise e
+        body_stream = response_body.get('Body')
         response_dict = {
-            'body': response_body.get('Body').read(),
+            # Stream the S3 body instead of reading it fully into memory first -
+            # these files can be many GB/TB, so buffering a ranged request's full
+            # body here would let a single request exhaust app server memory.
+            'app_iter': _iter_and_close(body_stream),
             # status_code : 206 if partial, 200 if the range covers whole file
             'status_code': response_body.get('ResponseMetadata').get('HTTPStatusCode'),
             'accept_ranges': response_body.get('AcceptRanges'),

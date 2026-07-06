@@ -6,7 +6,7 @@ encoded-core
 Change Log
 ----------
 
-0.9.9
+1.0.0
 =====
 * Replaced ``sts:GetFederationToken`` with ``sts:AssumeRole`` in ``external_creds()``
   (``types/file.py``) for scoped S3 upload/download credential generation. The
@@ -22,6 +22,28 @@ Change Log
   ``FederatedUser.FederatedUserId``.
 * Added a mocked-``boto3`` unit test covering the ``assume_role`` code path
   (role ARN sourcing, call shape, and response field mapping) to ``test_types_file.py``.
+
+
+0.9.8
+=====
+* Added direct unit tests for previously under-covered pure-logic modules
+  (``local_roles``, ``page_views`` tree helpers, ``WorkflowRun.steps`` run-data
+  mapping, ``types/document`` and ``types/tracking_item`` display logic). Tests
+  only; no production behavior changes.
+  
+
+0.9.7
+=====
+* Fixed SSRF/local-file-read vulnerability in ``StaticSection`` file content resolution
+  (``types/user_content.py``): remote fetches now validate the resolved IP is public
+  (with IP pinning to prevent DNS-rebinding) and refuse to follow redirects, and local
+  file paths are confined to the repo root.
+* Fixed confused-deputy SSRF in ``QualityMetric`` ``@@download`` (``qc_views.py``) by
+  strictly validating that the stored ``url`` points at an S3 endpoint hostname before
+  using it to build a presigned S3 URL.
+* Fixed a memory-exhaustion DoS in ``File`` ``@@download`` (``file_views.py``) where
+  Range requests buffered the entire S3 object body into memory; the response is now
+  streamed instead.
 
 
 0.9.6
