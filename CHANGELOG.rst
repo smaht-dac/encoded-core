@@ -6,7 +6,7 @@ encoded-core
 Change Log
 ----------
 
-1.0.0
+1.0.1
 =====
 * Replaced ``sts:GetFederationToken`` with ``sts:AssumeRole`` in ``external_creds()``
   (``types/file.py``) for scoped S3 upload/download credential generation. The
