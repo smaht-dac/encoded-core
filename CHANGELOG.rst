@@ -6,6 +6,14 @@ encoded-core
 Change Log
 ----------
 
+0.9.8
+=====
+* Added direct unit tests for previously under-covered pure-logic modules
+  (``local_roles``, ``page_views`` tree helpers, ``WorkflowRun.steps`` run-data
+  mapping, ``types/document`` and ``types/tracking_item`` display logic). Tests
+  only; no production behavior changes.
+  
+
 0.9.7
 =====
 * Fixed SSRF/local-file-read vulnerability in ``StaticSection`` file content resolution
@@ -18,7 +26,6 @@ Change Log
 * Fixed a memory-exhaustion DoS in ``File`` ``@@download`` (``file_views.py``) where
   Range requests buffered the entire S3 object body into memory; the response is now
   streamed instead.
-
 
 
 0.9.6
