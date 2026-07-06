@@ -28,6 +28,45 @@ def test_external_creds():
         assert 'upload_credentials' in ret.keys()
 
 
+def test_external_creds_assume_role(monkeypatch):
+    """ Confirms external_creds derives scoped S3 credentials via sts:AssumeRole
+        (rather than the retired sts:GetFederationToken), sourcing the role ARN
+        from S3_UPLOAD_ROLE_ARN and mapping the AssumeRole response fields correctly.
+    """
+    monkeypatch.delenv('IDENTITY', raising=False)
+    monkeypatch.setenv('S3_UPLOAD_ROLE_ARN', 'arn:aws:iam::123456789012:role/test-upload-role')
+
+    fake_sts_response = {
+        'Credentials': {
+            'AccessKeyId': 'FAKEACCESSKEY',
+            'SecretAccessKey': 'FAKESECRETKEY',
+            'SessionToken': 'FAKESESSIONTOKEN',
+            'Expiration': '2024-01-01T00:00:00Z',
+        },
+        'AssumedRoleUser': {
+            'Arn': 'arn:aws:sts::123456789012:assumed-role/test-upload-role/name',
+            'AssumedRoleId': 'AROAEXAMPLE123:name',
+        },
+        'ResponseMetadata': {'RequestId': 'fake-request-id'},
+    }
+    mock_sts_client = mock.Mock()
+    mock_sts_client.assume_role.return_value = fake_sts_response
+
+    with mock.patch.object(tf, 'boto3') as mock_boto3:
+        mock_boto3.client.return_value = mock_sts_client
+        ret = external_creds('test-wfout-bucket', 'test-key', 'name')
+
+    mock_boto3.client.assert_called_once_with('sts')
+    _, call_kwargs = mock_sts_client.assume_role.call_args
+    assert call_kwargs['RoleArn'] == 'arn:aws:iam::123456789012:role/test-upload-role'
+    assert call_kwargs['RoleSessionName'] == 'name'
+
+    creds = ret['upload_credentials']
+    assert creds['federated_user_arn'] == fake_sts_response['AssumedRoleUser']['Arn']
+    assert creds['federated_user_id'] == fake_sts_response['AssumedRoleUser']['AssumedRoleId']
+    assert creds['request_id'] == 'fake-request-id'
+
+
 @pytest.fixture
 def processed_file_data(file_formats):
     return {

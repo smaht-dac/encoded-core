@@ -6,6 +6,24 @@ encoded-core
 Change Log
 ----------
 
+1.0.0
+=====
+* Replaced ``sts:GetFederationToken`` with ``sts:AssumeRole`` in ``external_creds()``
+  (``types/file.py``) for scoped S3 upload/download credential generation. The
+  federation-token approach requires long-lived IAM user access keys and cannot be
+  called with temporary credentials, which blocks OIDC/task-role-based auth (e.g.
+  ECS Fargate task roles, GitHub Actions OIDC). ``assume_role`` works with the ambient
+  credential chain instead, so no explicit access keys are passed to ``boto3``.
+* The role to assume is read from ``S3_UPLOAD_ROLE_ARN``, sourced from the global
+  application configuration identity when ``IDENTITY`` is set, or from the environment
+  otherwise.
+* The response field mapping was updated accordingly: ``AssumedRoleUser.Arn`` /
+  ``AssumedRoleUser.AssumedRoleId`` replace ``FederatedUser.Arn`` /
+  ``FederatedUser.FederatedUserId``.
+* Added a mocked-``boto3`` unit test covering the ``assume_role`` code path
+  (role ARN sourcing, call shape, and response field mapping) to ``test_types_file.py``.
+
+
 0.9.8
 =====
 * Added direct unit tests for previously under-covered pure-logic modules

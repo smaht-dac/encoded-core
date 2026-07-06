@@ -63,6 +63,7 @@ jobs:
           # TRAVIS_JOB_ID: sno-x-test-${{ github.run_number }}-
           # This will be the new environment variable name.
           TEST_JOB_ID: sno-test-indexing-${{ github.run_number }}-${{ matrix.python_version }}-
+          S3_UPLOAD_ROLE_ARN: ${{ secrets.S3_UPLOAD_ROLE_ARN }}
         run: |
           make test
 
