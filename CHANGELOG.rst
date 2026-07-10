@@ -6,7 +6,7 @@ encoded-core
 Change Log
 ----------
 
-1.0.1
+1.0.2
 =====
 * Added an automatic tag-and-publish-to-PyPI job (``publish`` in
   ``.github/workflows/main.yml``, ``needs: build``) that runs after a successful test run
