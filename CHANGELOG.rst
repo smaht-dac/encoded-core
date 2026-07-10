@@ -6,6 +6,16 @@ encoded-core
 Change Log
 ----------
 
+1.0.2
+=====
+* Added an automatic tag-and-publish-to-PyPI job (``publish`` in
+  ``.github/workflows/main.yml``, ``needs: build``) that runs after a successful test run
+  on a push to ``main``. It determines the released version from ``pyproject.toml``
+  (``poetry version -s``), independently checks for an existing git tag and an existing
+  PyPI release for that version, and pushes the tag / publishes to PyPI only if each is
+  respectively missing. This lets the job self-heal if a prior run tagged successfully but
+  crashed before publishing, since the two checks are gated independently.
+
 1.0.0
 =====
 * Replaced ``sts:GetFederationToken`` with ``sts:AssumeRole`` in ``external_creds()``
